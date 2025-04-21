@@ -1,0 +1,11 @@
+.item{
+  width: 20px;
+  height: 20px;
+}
+
+.custom{
+  & > span:nth-child(2){
+    width: 18px;
+    height: 18px;
+  }
+}

@@ -1,0 +1,19 @@
+.container--mobile{
+  border-radius: 8px 8px 0 0;
+}
+
+.interactionItem {
+  width: 33.3333%;
+  border-right: 1px solid var(--color-neutral-10);
+  border-bottom: 1px solid var(--color-neutral-10);
+  transition: background 0.2s;
+}
+.interactionItem:hover {
+  background: var(--color-neutral-0);
+}
+.interactionItem:nth-child(3n) {
+  border-right: none;
+}
+.interactionItem:last-child {
+  border-bottom: 0;
+}

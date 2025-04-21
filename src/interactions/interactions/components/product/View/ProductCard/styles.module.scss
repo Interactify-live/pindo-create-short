@@ -1,0 +1,70 @@
+.container {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  font-size: 10px;
+  line-height: 16px;
+  width: 92px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: white;
+}
+
+.image {
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: 6px;
+}
+
+.content {
+  padding: 6px;
+}
+
+.title {
+  margin-bottom: 6px;
+  font-weight: 400;
+  color: #2c2c2c;
+
+  // show ellipsis after two lines
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  box-orient: vertical;
+  -webkit-box-orient: vertical;
+}
+
+.price {
+  font-weight: 600;
+  color: #299b91;
+}
+
+.simple {
+  flex-direction: row;
+  height: 36px;
+  padding: 1px;
+  width: 220px;
+}
+.simpleGroup {
+  width: 137px;
+}
+.simple .image {
+  width: 34px;
+  height: 34px;
+}
+.simple .content {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.simple .title {
+  margin-bottom: 0;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  margin-left: 4px;
+}
+.simple .price {
+  display: none;
+}

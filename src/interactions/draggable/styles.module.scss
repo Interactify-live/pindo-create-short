@@ -1,0 +1,41 @@
+@use "sass:math";
+
+.item--active {
+  outline: 1px dashed var(--color-primary-50);
+  outline-offset: 2px;
+}
+
+$resize-handle-size: 16px;
+$margin: -1 * math.div($resize-handle-size, 2);
+
+.resizeHandles > * {
+  z-index: 900;
+  background: var(--color-primary-50);
+  position: absolute;
+  width: $resize-handle-size;
+  height: $resize-handle-size;
+}
+
+.resizeHandleTR {
+  cursor: ne-resize;
+  right: $margin;
+  top: $margin;
+}
+
+.resizeHandleTL {
+  cursor: nw-resize;
+  left: $margin;
+  top: $margin;
+}
+
+.resizeHandleBR {
+  cursor: se-resize;
+  right: $margin;
+  bottom: $margin;
+}
+
+.resizeHandleBL {
+  cursor: sw-resize;
+  left: $margin;
+  bottom: $margin;
+}

@@ -1,0 +1,285 @@
+//@import "../../../../node_modules/antd/dist/reset.css";
+/* @import "@fontsource/montserrat/400.css"; */
+/* @import "@fontsource/montserrat/500.css"; */
+/* @import "vazirmatn/Vazirmatn-font-face.css"; */
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v5.0.1 | 20191019
+   License: none (public domain)
+*/
+* {
+  box-sizing: border-box;
+  font-weight: 400;
+}
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section {
+  display: block;
+}
+
+/* HTML5 hidden-attribute fix for newer browsers */
+*[hidden] {
+  display: none;
+}
+
+body {
+  line-height: 1;
+}
+
+menu,
+ol,
+ul {
+  list-style: none;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: "";
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html,
+body,
+#root,
+h1,
+h2,
+h3,
+h4,
+h5,
+input,
+span,
+label,
+textarea,
+.ant-form-item-explain-error .ant-notification-notice-message,
+.ant-steps-item-title,
+* {
+  font-family: Montserrat, Vazirmatn !important;
+  margin: 0;
+}
+
+a {
+  color: #8820eb;
+  text-decoration: none;
+}
+
+.ant-input {
+  height: 42px;
+  border-radius: unset;
+}
+
+.ant-input-password .ant-input {
+  height: 35px;
+  border-radius: unset;
+}
+
+.ant-input-password {
+  height: 42px;
+  border-radius: unset;
+}
+
+.ant-select-selector {
+  height: 100% !important;
+  border-radius: unset !important;
+  display: flex;
+  align-items: center;
+}
+
+.ant-select-selection-item {
+  height: 100% !important;
+  border-radius: unset !important;
+  display: flex;
+  align-items: center;
+}
+
+.ant-select {
+  height: 42px;
+}
+
+.spaceselector .ant-select-selector {
+  height: 38px !important;
+  padding: 0 0 0 0 !important;
+}
+
+.spaceselector .ant-select-selection-item {
+  background: rgb(248, 248, 248);
+}
+
+.labled-form-item .ant-select-selector {
+  border-radius: 6px !important;
+}
+
+.circle-picker {
+  max-width: 200px;
+}
+
+.circle-picker span {
+  width: 28px;
+  margin-right: 3px;
+}
+
+textarea {
+  border-radius: 6px !important;
+}
+
+.ant-upload-list {
+  margin-top: 10px;
+}
+
+.ant-upload .ant-upload-btn {
+  padding: 0 !important;
+}
+
+.ant-upload-wrapper {
+  height: 100% !important;
+}
+
+.upload-button {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.upload-button .ant-upload-select {
+  height: 100% !important;
+  padding: 0 !important;
+  border: none !important;
+  color: white;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+}
+
+.ant-upload {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.ant-select-selection-search input {
+  height: 100% !important;
+}
+
+.permissionSelector .ant-select-selector {
+  border: none !important;
+}
+
+.live-player div video {
+  max-height: 680px;
+}

@@ -1,0 +1,10 @@
+.container{
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  padding: 0 5px;
+}
+
+.container--user-view{
+  overflow: auto hidden;
+}
