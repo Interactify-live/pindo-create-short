@@ -1,4 +1,3 @@
-import classnames from "classnames";
 import { makeGeometricRelative } from "./draggable";
 import { INTERACTIONS_CONTAINER_BASE_WIDTH } from "../shared/constants";
 import { Interaction } from "./components/Interactions";
@@ -32,6 +31,10 @@ function ShortCreateInteractionsStep({
   const [activeMedia, setActiveMedia] = useState(
     medias.length > 0 ? medias.length - 1 : 0,
   );
+
+  useEffect(() => {
+    console.log("KIR", medias[activeMedia]);
+  }, [medias, activeMedia]);
 
   useEffect(() => {
     console.log("Updated interactions", medias);
@@ -77,17 +80,35 @@ function ShortCreateInteractionsStep({
 
   return (
     <div
-      className="w-full h-full d-flex flex-col"
-      style={{ position: "relative" }}
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
     >
       {/* Header */}
-      <div className="pos-absolute top-0 left-0 right-0 w-full px-3 pt-3 d-flex jc-between z-3">
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          width: "100%",
+          paddingLeft: "12px",
+          paddingRight: "12px",
+          paddingTop: "12px",
+          display: "flex",
+          justifyContent: "space-between",
+          zIndex: 12,
+        }}
+      >
         {hasAnyActiveInteraction ? (
           <>
             <button
               color="white"
-              className="opacity-50"
-              style={{ background: "none", border: "none" }}
+              style={{ background: "none", border: "none", opacity: 50 }}
               onClick={onDeleteActiveInteraction}
             >
               <Trash />
@@ -128,9 +149,6 @@ function ShortCreateInteractionsStep({
                 activeMedia={activeMedia}
                 style={{ width: INTERACTIONS_CONTAINER_BASE_WIDTH }}
                 onAddInteraction={onAddInteraction}
-                className={classnames("z-10", {
-                  "pos-absolute bottom-0": true,
-                })}
                 onDelete={onDeleteActiveInteraction}
               />
             </div>
@@ -151,7 +169,7 @@ function ShortCreateInteractionsStep({
             </div>
 
             {/* Right - CloseButton */}
-            <div style={{ marginLeft: "auto" }}>
+            <div style={{ marginLeft: "auto", marginRight: "20px" }}>
               <CloseButton />
             </div>
           </div>
@@ -159,10 +177,8 @@ function ShortCreateInteractionsStep({
       </div>
 
       {/* Video - fills remaining space */}
-      <div className="flex-grow-1 position-relative" style={{ height: "100%" }}>
+      <div style={{ height: "100%", flexGrow: 1, position: "relative" }}>
         <VideoPlayer
-          wrapperClassName="w-full h-full"
-          className="w-full h-full"
           medias={medias}
           setMedias={setMedias}
           activeMedia={activeMedia}
@@ -175,7 +191,7 @@ function ShortCreateInteractionsStep({
       <div
         style={{
           position: "absolute",
-          bottom: "110px",
+          bottom: "130px",
           display: "flex",
           width: "100%",
           height: "40px",
@@ -227,8 +243,8 @@ function ShortCreateInteractionsStep({
         </div>
       </div>
       <div
-        className="w-full py-2"
         style={{
+          width: "100%",
           flexShrink: 0,
           height: "92px",
           background: "black",
@@ -273,7 +289,14 @@ function ShortCreateInteractionsStep({
         </div>
 
         {/* Right - items */}
-        <div style={{ display: "flex", gap: "3px", overflow: "auto" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "3px",
+            overflow: "auto",
+            marginRight: "30px",
+          }}
+        >
           {medias.map((media, idx) => {
             if (media.fileType === VideoType) {
               const video = media.data as Video;
@@ -326,8 +349,14 @@ function ShortCreateInteractionsStep({
       </div>
       {showOverlay && (
         <div
-          className="pos-absolute top-0 left-0 w-full h-full d-flex flex-col"
           style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100&",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
             backgroundColor: "rgba(0,0,0,0.6)",
             zIndex: 999,
             justifyContent: "center",

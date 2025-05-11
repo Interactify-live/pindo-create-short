@@ -13,14 +13,21 @@ function MobileConfig({ setPayload, payload }: Props) {
           height: 280,
           maxHeight: "100%",
           top: `calc(var(--window-inner-height) / 2 - 140px)`,
+          position: "absolute",
+          right: 0,
+          zIndex: 40,
         }}
-        className="pos-absolute right-0 z-10"
       ></div>
       <div
-        className="pos-absolute w-full left-0 right-0 pl-4 z-10"
         style={{
           height: 32,
           top: `calc(var(--window-inner-height) - 16px - 32px)`,
+          position: "absolute",
+          width: "100%",
+          left: 0,
+          right: 0,
+          paddingLeft: "16px",
+          zIndex: 40,
         }}
       ></div>
     </>

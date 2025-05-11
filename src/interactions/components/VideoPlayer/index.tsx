@@ -5,10 +5,8 @@ import {
   useRef,
   useState,
 } from "react";
-import classnames from "classnames";
 import { MultipleNativePlayer } from "../MultipleNativePlayer";
 import { InteractionView } from "./InteractionView";
-import styles from "./styles.module.scss";
 import { Draggable } from "../../draggable";
 import { Media, VideoType } from "../../types.d/types";
 import Pause from "../../../icons/pause";
@@ -63,35 +61,37 @@ function VideoPlayer({
   };
 
   return (
-    <div
-      className={classnames(wrapperClassName, styles.container)}
-      style={style}
-    >
+    <div style={{ width: "100%", height: "100%" }}>
       <Draggable.Container>
         {({ ref }) => (
           <div
             ref={ref}
-            className={classnames(
-              className,
-              "ratio-9-16 bg-neutral-30 lg:rounded-2 pos-relative overflow-hidden w-full h-full",
-            )}
             style={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
               background: "black",
+              aspectRatio: "9 / 16",
+              position: "relative",
+              overflow: "hidden",
+              width: "100%",
+              height: "100%",
             }}
           >
             {media.fileType === VideoType && activeInteraction === -1 && (
               <button
                 onClick={onToggleVideoClick}
-                className="rounded-circle pos-absolute right-0 mr-3 mb-3 z-10"
                 color="white"
                 style={{
-                  right: "calc(50% - 55px)",
+                  right: "calc(50% - 35px)",
                   padding: 0,
                   background: "none",
                   border: "none",
+                  borderRadius: "50%",
+                  position: "absolute",
+                  marginRight: "12px",
+                  marginBottom: "12px",
+                  zIndex: 40,
                 }}
               >
                 {isPlaying ? <Pause /> : <Play />}
@@ -100,7 +100,6 @@ function VideoPlayer({
             {media.fileType === VideoType ? (
               <MultipleNativePlayer
                 onEnded={onVideoEnded}
-                className="w-full h-full"
                 ref={videoRef}
                 sources={[media.data]}
                 loop

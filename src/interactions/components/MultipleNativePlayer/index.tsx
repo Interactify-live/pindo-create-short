@@ -186,7 +186,17 @@ const MultipleNativePlayerComponent = forwardRef<Ref, Props>(
 
     if (sources.length === 0) {
       return (
-        <div className="tg-body-lg color-neutral-70 d-flex ai-center jc-center h-full">
+        <div
+          style={{
+            fontWeight: 400,
+            fontSize: "16px",
+            lineHeight: "24px",
+            color: "rgb(87, 87, 87)",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+          }}
+        >
           No video available
         </div>
       );
@@ -197,8 +207,9 @@ const MultipleNativePlayerComponent = forwardRef<Ref, Props>(
         style={{
           backgroundImage: cover ? `url(${cover})` : "unset",
           backgroundSize: "100%",
+          width: "100%",
+          height: "100%",
         }}
-        className={className}
       >
         {sources.map((source, index) => (
           <ReactPlayer
@@ -212,10 +223,11 @@ const MultipleNativePlayerComponent = forwardRef<Ref, Props>(
             {...props}
             wrapper={({ children }) => (
               <div
-                className="w-full h-full"
                 onClick={() => onClick({ toggleMuted })}
                 style={{
                   display: currentSource === index ? "block" : "none",
+                  width: "100%",
+                  height: "100%",
                 }}
               >
                 {children}

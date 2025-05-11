@@ -69,10 +69,7 @@ function InteractionsContainer({
         <ConfigComponent payload={payload} setPayload={setPayload} />
       )}
       {!hasAnyActiveInteraction && (
-        <InteractionsList
-          className={className}
-          onClickInteraction={onAddInteraction}
-        />
+        <InteractionsList onClickInteraction={onAddInteraction} />
       )}
     </>
   );

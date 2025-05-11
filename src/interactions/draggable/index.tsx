@@ -80,7 +80,7 @@ function DraggableItem({
   geometric: Geometric;
   onChange: (
     props: Partial<Geometric>,
-    options: { container: HTMLElement }
+    options: { container: HTMLElement },
   ) => void;
   draggable?: boolean;
   resizable?: boolean;
@@ -180,7 +180,7 @@ function DraggableItem({
             width,
             height,
           },
-          { container: containerRef }
+          { container: containerRef },
         );
       } else if (isActive && draggable) {
         justMoved.current = true;
@@ -190,7 +190,7 @@ function DraggableItem({
             x: geometric.x + mouseMoveX,
             y: geometric.y + mouseMoveY,
           },
-          { container: containerRef }
+          { container: containerRef },
         );
       }
 
@@ -219,16 +219,16 @@ function DraggableItem({
       }}
       onMouseDown={onDown}
       onTouchStart={onDown}
-      className={classnames(
-        "max-w-full w-max-content pos-absolute border-box user-select-none",
-        styles["item"],
-        {
-          "cursor-move": isActive,
-          [styles["item--active"]]: isActive,
-          "cursor-pointer": !isActive,
-        }
-      )}
+      className={classnames(styles["item"], {
+        "cursor-move": isActive,
+        [styles["item--active"]]: isActive,
+        "cursor-pointer": !isActive,
+      })}
       style={{
+        maxWidth: "100%",
+        position: "absolute",
+        boxSizing: "border-box",
+        userSelect: "none",
         left: geometric.x,
         top: geometric.y,
         width: resizable ? geometric.width : "auto",

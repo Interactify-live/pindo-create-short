@@ -28,9 +28,7 @@ function Capture({ onSelect }: Props) {
   useEffect(() => {
     getDevices()
       .then((videoDevices) => setVideoDevices(videoDevices))
-      .catch((e) => {
-        console.error("enumerateDevices", e);
-      });
+      .catch((e) => console.error("enumerateDevices", e));
   }, []);
 
   const [mediaStream, setMediaStream] = useState<null | MediaStream>(null);
@@ -39,14 +37,11 @@ function Capture({ onSelect }: Props) {
       const stream = await navigator.mediaDevices.getUserMedia(
         getConstraints(videoDevices[videoDeviceIndex]),
       );
-
       setMediaStream(stream);
-
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         initialize(videoRef.current);
       }
-
       return stream;
     } catch (e) {
       console.error("getUserMedia", e);
@@ -109,6 +104,8 @@ function Capture({ onSelect }: Props) {
         flexDirection: "column",
         height: "100vh",
         background: "black",
+        width: "100vw",
+        overflow: "hidden",
       }}
     >
       {/* Top header */}
@@ -131,23 +128,32 @@ function Capture({ onSelect }: Props) {
       </div>
 
       {/* Main camera preview */}
-      <div style={{ flexGrow: 1, position: "relative" }}>
+      <div
+        style={{
+          flexGrow: 1,
+          backgroundColor: "black",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "relative",
+        }}
+      >
         <video
           playsInline
           muted
           autoPlay
           ref={videoRef}
           style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
+            display: "block",
+            width: "100vw",
+            height: "auto",
+            margin: "0 auto",
+            backgroundColor: "black",
+            maxHeight: "100vh",
           }}
         />
 
-        {/* Capture mode switch (video/photo) */}
+        {/* Capture mode switch */}
         <div
           style={{
             position: "absolute",
@@ -203,20 +209,21 @@ function Capture({ onSelect }: Props) {
       <div
         style={{
           display: "flex",
-          padding: "24px",
           alignItems: "center",
+          justifyContent: "space-between",
           width: "100%",
           background: "black",
           height: "92px",
           flexShrink: 0,
         }}
       >
+        {/* Left: Gallery */}
         <div
           style={{
-            flex: 1,
             display: "flex",
-            justifyContent: "flex-start",
             width: "100px",
+            marginLeft: "30px",
+            justifyContent: "flex-start",
           }}
         >
           <BrowseFileButton
@@ -225,7 +232,8 @@ function Capture({ onSelect }: Props) {
           />
         </div>
 
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        {/* Center: Record Button */}
+        <div style={{ display: "flex", justifyContent: "center", flex: 1 }}>
           {mediaStream && (
             <RecordButton
               captureType={captureType}
@@ -241,12 +249,13 @@ function Capture({ onSelect }: Props) {
           )}
         </div>
 
+        {/* Right: Switch Camera */}
         <div
           style={{
-            flex: 1,
             display: "flex",
-            justifyContent: "flex-end",
             width: "100px",
+            marginRight: "30px",
+            justifyContent: "flex-end",
           }}
         >
           {videoDevices.length > 1 && (

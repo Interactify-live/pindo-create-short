@@ -95,10 +95,10 @@ function InteractionView({
     <Draggable.Item
       geometric={tmpGeometric}
       onChange={(newGeometric) => {
-        const canOnlyMoveVertically =
-          interaction.interaction.type === "product" &&
-          interaction.payload.products.length >
-            (interaction.payload.style === "simple" ? 2 : 3);
+        const canOnlyMoveVertically = null;
+        // interaction.interaction.type === "product" &&
+        // interaction.payload.products.length >
+        //   (interaction.payload.style === "simple" ? 2 : 3);
 
         setTmpGeometric((geometric) => ({
           ...geometric,
