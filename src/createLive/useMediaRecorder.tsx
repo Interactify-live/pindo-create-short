@@ -20,13 +20,17 @@ function useMediaRecorder({
   onRecordEnd,
   maxDuration,
   onRecordStart,
+  onPhotoTaken,
 }: {
   maxDuration?: number;
-  onRecordStart: VoidFunction;
-  onRecordEnd: (blob: File) => void;
+  onRecordStart?: VoidFunction;
+  onRecordEnd?: (blob: File) => void;
+  onPhotoTaken?: (photo: File) => void;
 }) {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorder: MutableRefObject<MediaRecorder | null> = useRef(null);
+  const videoRef: MutableRefObject<HTMLVideoElement | null> = useRef(null);
+  const streamRef: MutableRefObject<MediaStream | null> = useRef(null);
 
   useEffect(() => {
     if (!isRecording || !maxDuration) {
@@ -42,7 +46,24 @@ function useMediaRecorder({
     };
   }, [isRecording]);
 
+  const initialize = async (videoElement: HTMLVideoElement) => {
+    videoRef.current = videoElement;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false,
+      });
+      streamRef.current = stream;
+      videoElement.srcObject = stream;
+      await videoElement.play();
+    } catch (error) {
+      console.error("Error initializing camera:", error);
+    }
+  };
+
   const record = (stream: MediaStream) => {
+    if (!onRecordStart) return;
+
     setIsRecording(true);
     onRecordStart();
 
@@ -57,23 +78,62 @@ function useMediaRecorder({
         recordedChunks.push(event.data);
       }
     };
+
     mediaRecorder.current.onstop = () => {
+      if (!onRecordEnd) return;
+
       const recordedBlob = new Blob(recordedChunks, { type: mimeType });
       recordedChunks.length = 0;
-      const file = new File([recordedBlob], `recorded-short.${fileExtension}`, {
+      const file = new File([recordedBlob], `recorded-video.${fileExtension}`, {
         type: mimeType,
       });
       onRecordEnd(file);
       setIsRecording(false);
       mediaRecorder.current = null;
     };
+
     mediaRecorder.current.start();
   };
-  const stop = () => {
-    mediaRecorder.current?.stop();
+
+  const takePhoto = () => {
+    console.log(videoRef.current);
+    if (!videoRef.current || !onPhotoTaken) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext("2d");
+
+    if (ctx) {
+      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], "captured-photo.png", {
+            type: "image/png",
+          });
+          onPhotoTaken(file);
+        }
+      }, "image/png");
+    }
   };
 
-  return { record, stop, isRecording };
+  const stop = () => {
+    mediaRecorder.current?.stop();
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  };
+
+  return {
+    initialize,
+    record,
+    stop,
+    takePhoto,
+    isRecording,
+  };
 }
 
 useMediaRecorder.isSupported = () =>

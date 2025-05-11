@@ -1,21 +1,21 @@
 import { ComponentProps } from "react";
-import { FontSizeOutlined } from "@ant-design/icons";
 import { INTERACTIONS } from "../../../interactions";
 import { InteractionValidate } from "../../../types/interactionValidator";
 import { Validators } from "../../../validators";
+import TextButton from "../../../../createLive/TextButton/TextButton";
 
 const TextInteraction = INTERACTIONS["text"];
 
 export type Payload = ComponentProps<typeof TextInteraction.View>["payload"];
 
 const name = "Text";
-const icon = FontSizeOutlined;
+const icon = TextButton;
 const type = TextInteraction.type;
 const defaultPayload: Payload = {
   text: "",
   size: 30,
-  background: "#ffffff",
-  color: "#000000",
+  background: "rgba(0,0,0,0)",
+  color: "#fff",
 };
 const draggableOptions = {};
 const { View } = TextInteraction;

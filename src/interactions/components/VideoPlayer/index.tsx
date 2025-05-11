@@ -5,36 +5,37 @@ import {
   useRef,
   useState,
 } from "react";
-import { CaretRightOutlined, PauseOutlined } from "@ant-design/icons";
 import classnames from "classnames";
 import { MultipleNativePlayer } from "../MultipleNativePlayer";
 import { InteractionView } from "./InteractionView";
 import styles from "./styles.module.scss";
 import { Draggable } from "../../draggable";
-import { Button } from "../../../components/Button";
-import { InteractionItem, Video } from "../../types.d/types";
+import { Media, VideoType } from "../../types.d/types";
+import Pause from "../../../icons/pause";
+import Play from "../../../icons/play";
 
 interface Props {
   className?: string;
   style?: CSSProperties;
   wrapperClassName?: string;
-  interactions: InteractionItem[];
-  setInteractions: React.Dispatch<React.SetStateAction<InteractionItem[]>>;
+  medias: Media[];
+  setMedias: React.Dispatch<React.SetStateAction<Media[]>>;
+  activeMedia: number;
   activeInteraction: number;
   setActiveInteraction: React.Dispatch<React.SetStateAction<number>>;
-  videos: Video[];
-  cover: string;
+  media: Media;
 }
 
 function VideoPlayer({
   wrapperClassName,
   className,
   style,
-  interactions,
-  setInteractions,
+  medias,
+  setMedias,
+  activeMedia,
   activeInteraction,
-  videos,
-  cover,
+  setActiveInteraction,
+  media,
 }: Props) {
   const videoRef = useRef<ComponentRef<typeof MultipleNativePlayer>>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -74,43 +75,50 @@ function VideoPlayer({
               className,
               "ratio-9-16 bg-neutral-30 lg:rounded-2 pos-relative overflow-hidden w-full h-full",
             )}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              background: "black",
+            }}
           >
-            {activeInteraction === -1 && (
-              <Button
+            {media.fileType === VideoType && activeInteraction === -1 && (
+              <button
                 onClick={onToggleVideoClick}
-                shape="fill"
                 className="rounded-circle pos-absolute right-0 mr-3 mb-3 z-10"
                 color="white"
-                style={{ bottom: 70 }}
-                size="lg"
+                style={{
+                  right: "calc(50% - 55px)",
+                  padding: 0,
+                  background: "none",
+                  border: "none",
+                }}
               >
-                {isPlaying ? (
-                  <PauseOutlined
-                    style={{ fontSize: 16, color: "var(--color-neutral-80)" }}
-                  />
-                ) : (
-                  <CaretRightOutlined
-                    style={{ fontSize: 16, color: "var(--color-neutral-80)" }}
-                  />
-                )}
-              </Button>
+                {isPlaying ? <Pause /> : <Play />}
+              </button>
             )}
-            <MultipleNativePlayer
-              onEnded={onVideoEnded}
-              className="w-full h-full"
-              ref={videoRef}
-              sources={videos}
-              loop
-              onClick={onVideoClick}
-              cover={cover}
-            />
-            {interactions.map((interaction, index) => (
+            {media.fileType === VideoType ? (
+              <MultipleNativePlayer
+                onEnded={onVideoEnded}
+                className="w-full h-full"
+                ref={videoRef}
+                sources={[media.data]}
+                loop
+                onClick={onVideoClick}
+              />
+            ) : (
+              <img src={media.data.src} style={{ width: "100%" }} />
+            )}
+            {medias[activeMedia].interactions.map((interaction, index) => (
               <InteractionView
                 index={index}
                 key={index}
                 interaction={interaction}
-                interactions={interactions}
-                setInteractions={setInteractions}
+                medias={medias}
+                setMedias={setMedias}
+                activeMedia={activeMedia}
+                activeInteraction={activeInteraction}
+                setActiveInteraction={setActiveInteraction}
               />
             ))}
           </div>

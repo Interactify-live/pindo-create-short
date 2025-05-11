@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import ReactPlayer from "react-player";
+import { Video } from "../../types.d/types";
 
 interface Source {
   src: string;
@@ -39,12 +40,16 @@ const MultipleNativePlayerComponent = forwardRef<Ref, Props>(
     { onEnded, sources, className, cover, onClick, loop, ...props }: Props,
     ref,
   ) => {
+    useEffect(() => {
+      console.log("SOURCE", sources);
+    }, [sources]);
     const [isReady, setIsReady] = useState(false);
     const videosRef = useRef<Array<ComponentRef<typeof ReactPlayer> | null>>(
       Array.from({ length: sources.length }, () => null),
     );
     const [currentSource, setCurrentSource] = useState(0);
     const currentSourceRef = useRef(0);
+    // const timeUpdateCallback = useRef(() => void 0);
     const timeUpdateCallback = useRef<() => void>(() => {});
     const endedRef = useRef(true);
     const isPlayingRef = useRef(props.autoPlay);
@@ -159,14 +164,13 @@ const MultipleNativePlayerComponent = forwardRef<Ref, Props>(
           video.play();
         }
       };
-      const onTimeUpdate = ({ currentTarget: video }: any) => {
+      const onTimeUpdate = (e: Event) => {
+        const video = e.currentTarget as HTMLVideoElement;
         timeUpdateCallback.current();
 
         const trimEnd =
           sources[currentSourceRef.current].trim?.end || video.duration;
-        if (video.currentTime < trimEnd) {
-          return;
-        }
+        if (video.currentTime < trimEnd) return;
 
         gotoNextSource();
       };

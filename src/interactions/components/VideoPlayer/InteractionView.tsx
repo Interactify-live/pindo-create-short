@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { Form } from "antd";
 import debounce from "lodash/debounce";
 import {
   Draggable,
@@ -8,7 +7,7 @@ import {
   RelativeGeometric,
 } from "../../draggable";
 import { Interaction } from "../Interactions";
-import { InteractionItem } from "../../types.d/types";
+import { InteractionItem, Media } from "../../types.d/types";
 
 /**
  * This component wraps Interaction.View component into DraggableItem.
@@ -19,24 +18,30 @@ import { InteractionItem } from "../../types.d/types";
 
 function InteractionView({
   interaction,
-  interactions,
-  setInteractions,
+  medias,
+  setMedias,
+  activeMedia,
+  activeInteraction,
+  setActiveInteraction,
   index,
 }: {
   interaction: InteractionItem;
-  interactions: InteractionItem[];
-  setInteractions: React.Dispatch<React.SetStateAction<InteractionItem[]>>;
+  medias: Media[];
+  setMedias: React.Dispatch<React.SetStateAction<Media[]>>;
+  activeMedia: number;
+  activeInteraction: number;
+  setActiveInteraction: React.Dispatch<React.SetStateAction<number>>;
   index: number;
 }) {
   const [tmpGeometric, setTmpGeometric] = useState<Geometric>(
     interaction.geometric,
   );
   const { View, draggableOptions }: any = interaction.interaction;
-  const [activeInteraction, setActiveInteraction] = useState<number>(0);
 
   const onClick = useCallback(() => {
     if (activeInteraction !== -1 && activeInteraction !== index) {
-      const { interaction, payload } = interactions[activeInteraction];
+      const { interaction, payload } =
+        medias[activeMedia].interactions[activeInteraction];
       const errors = (interaction as any).validate({ payload });
       const isActiveInteractionValid = Object.values(errors)
         .flat()
@@ -52,11 +57,22 @@ function InteractionView({
 
   const updateForm = useCallback(
     debounce((newGeometric: Geometric) => {
-      interactions[index] = {
-        ...interactions[index],
+      medias[activeMedia].interactions[index] = {
+        ...medias[activeMedia].interactions[index],
         geometric: makeGeometricRelative(newGeometric),
       };
-      setInteractions(interactions.slice());
+      console.log("FIRST", medias[activeMedia].interactions.slice());
+      setMedias((prevMedias) => {
+        return prevMedias.map((media, index) => {
+          if (index === activeMedia) {
+            return {
+              ...media,
+              interactions: [...media.interactions], // Creates a new copy of interactions array
+            };
+          }
+          return media;
+        });
+      });
     }, 1000),
     [interaction, index],
   );
@@ -67,10 +83,12 @@ function InteractionView({
      * So, If you remove these interactions, they will get unmounted and also call this function.
      * And this causes error.
      */
-    try {
-      interactions[activeInteraction].payload[key] = value;
-      setInteractions(interactions.slice());
-    } catch (e) {}
+    console.log("key", key, "value", value);
+    // try {
+    //   interactions[activeInteraction].payload[key] = value;
+    //   console.log("SECOND", interactions.slice());
+    //   setInteractions(interactions.slice());
+    // } catch (e) {}
   };
 
   return (

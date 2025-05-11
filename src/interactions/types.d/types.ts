@@ -7,9 +7,25 @@ export interface Video {
   originDuration: number;
   trim: { start: number; end: number };
   src: string;
+  thumbnail: string;
 }
+
+export interface Image {
+  file: File;
+  src: string;
+}
+
+export const VideoType = "video";
+export const ImageType = "image";
+export type FileType = typeof ImageType | typeof VideoType;
+
 export interface InteractionItem {
   interaction: Interaction;
   payload: any;
   geometric: RelativeGeometric;
+}
+export interface Media {
+  fileType: FileType;
+  data: Video | Image;
+  interactions: InteractionItem[];
 }
