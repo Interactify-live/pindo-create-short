@@ -146,7 +146,7 @@ function Capture({ onSelect }: Props) {
           style={{
             display: "block",
             width: "100vw",
-            height: "auto",
+            height: "calc(100vh - 92px)",
             margin: "0 auto",
             backgroundColor: "black",
             maxHeight: "100vh",

@@ -44,10 +44,12 @@ function VideoPlayer({
     },
     [],
   );
+
   const onVideoEnded = useCallback(() => {
     setIsPlaying(false);
-  }, [setIsPlaying]);
-  const onToggleVideoClick = () => {
+  }, []);
+
+  const onToggleVideoClick = useCallback(() => {
     if (!videoRef.current) {
       return;
     }
@@ -57,8 +59,8 @@ function VideoPlayer({
     } else {
       videoRef.current.play();
     }
-    setIsPlaying((isPlaying) => !isPlaying);
-  };
+    setIsPlaying((prev) => !prev); // Optimized state update
+  }, [isPlaying]);
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
@@ -75,29 +77,32 @@ function VideoPlayer({
               position: "relative",
               overflow: "hidden",
               width: "100%",
-              height: "100%",
+              maxWidth: "auto",
+              height: "calc(100vh - 92px)",
             }}
           >
-            {media.fileType === VideoType && activeInteraction === -1 && (
-              <button
-                onClick={onToggleVideoClick}
-                color="white"
-                style={{
-                  right: "calc(50% - 35px)",
-                  padding: 0,
-                  background: "none",
-                  border: "none",
-                  borderRadius: "50%",
-                  position: "absolute",
-                  marginRight: "12px",
-                  marginBottom: "12px",
-                  zIndex: 40,
-                }}
-              >
-                {isPlaying ? <Pause /> : <Play />}
-              </button>
-            )}
-            {media.fileType === VideoType ? (
+            {media &&
+              media.fileType === VideoType &&
+              activeInteraction === -1 && (
+                <button
+                  onClick={onToggleVideoClick}
+                  color="white"
+                  style={{
+                    right: "calc(50% - 35px)",
+                    padding: 0,
+                    background: "none",
+                    border: "none",
+                    borderRadius: "50%",
+                    position: "absolute",
+                    marginRight: "12px",
+                    marginBottom: "12px",
+                    zIndex: 40,
+                  }}
+                >
+                  {isPlaying ? <Pause /> : <Play />}
+                </button>
+              )}
+            {media && media.fileType === VideoType ? (
               <MultipleNativePlayer
                 onEnded={onVideoEnded}
                 ref={videoRef}
@@ -106,20 +111,30 @@ function VideoPlayer({
                 onClick={onVideoClick}
               />
             ) : (
-              <img src={media.data.src} style={{ width: "100%" }} />
-            )}
-            {medias[activeMedia].interactions.map((interaction, index) => (
-              <InteractionView
-                index={index}
-                key={index}
-                interaction={interaction}
-                medias={medias}
-                setMedias={setMedias}
-                activeMedia={activeMedia}
-                activeInteraction={activeInteraction}
-                setActiveInteraction={setActiveInteraction}
+              <img
+                src={media && media.data.src}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  backgroundColor: "black",
+                }}
               />
-            ))}
+            )}
+            {medias &&
+              medias[activeMedia] &&
+              medias[activeMedia].interactions.map((interaction, index) => (
+                <InteractionView
+                  key={index}
+                  index={index}
+                  interaction={interaction}
+                  medias={medias}
+                  setMedias={setMedias}
+                  activeMedia={activeMedia}
+                  activeInteraction={activeInteraction}
+                  setActiveInteraction={setActiveInteraction}
+                />
+              ))}
           </div>
         )}
       </Draggable.Container>
