@@ -1,4 +1,4 @@
-FROM node:18.5.0 as builder
+FROM node:18.5.0 AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ COPY --chown=node:node [".", "/app/"]
 
 RUN npm run build
 
-FROM nginx:1.25.3-alpine3.18 as prod
+FROM nginx:1.25.3-alpine3.18 AS prod
 
 COPY --chown=nginx:nginx --from=builder ["/app/build", "/usr/share/nginx/html"]
 COPY ["./default.conf", "/etc/nginx/conf.d/default.conf"]

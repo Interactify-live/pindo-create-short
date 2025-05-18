@@ -27,7 +27,10 @@ function Capture({ onSelect }: Props) {
 
   useEffect(() => {
     getDevices()
-      .then((videoDevices) => setVideoDevices(videoDevices))
+      .then((videoDevices) => {
+        console.log(videoDevices);
+        setVideoDevices(videoDevices);
+      })
       .catch((e) => console.error("enumerateDevices", e));
   }, []);
 
@@ -37,6 +40,7 @@ function Capture({ onSelect }: Props) {
       const stream = await navigator.mediaDevices.getUserMedia(
         getConstraints(videoDevices[videoDeviceIndex]),
       );
+      console.log("index", videoDeviceIndex);
       setMediaStream(stream);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -62,6 +66,7 @@ function Capture({ onSelect }: Props) {
     let isUnmounted = false;
     let mediaStream: MediaStream | null = null;
 
+    stopVideo(mediaStream);
     startVideo().then((stream) => {
       mediaStream = stream;
       if (isUnmounted) stopVideo(stream);
@@ -102,7 +107,7 @@ function Capture({ onSelect }: Props) {
       style={{
         display: "flex",
         flexDirection: "column",
-        height: "100vh",
+        height: "100dvh",
         background: "black",
         width: "100vw",
         overflow: "hidden",
@@ -136,6 +141,7 @@ function Capture({ onSelect }: Props) {
           justifyContent: "center",
           alignItems: "center",
           position: "relative",
+          height: "calc(100dvh - 105px)", // bottom bar height
         }}
       >
         <video
@@ -146,10 +152,10 @@ function Capture({ onSelect }: Props) {
           style={{
             display: "block",
             width: "100vw",
-            height: "calc(100vh - 92px)",
+            height: "calc(100dvh - 105px)", // bottom bar height
             margin: "0 auto",
             backgroundColor: "black",
-            maxHeight: "100vh",
+            // maxHeight: "100dvh",
           }}
         />
 
@@ -161,7 +167,7 @@ function Capture({ onSelect }: Props) {
             bottom: "0",
             color: "white",
             background: "rgba(0, 0, 0, 0.4)",
-            height: "150px",
+            height: "120px",
             display: "flex",
           }}
         >
@@ -212,8 +218,9 @@ function Capture({ onSelect }: Props) {
           alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
+          paddingBottom: "13px",
           background: "black",
-          height: "92px",
+          height: "105px",
           flexShrink: 0,
         }}
       >

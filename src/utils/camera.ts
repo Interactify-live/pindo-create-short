@@ -2,6 +2,10 @@ import { isMobile, isSafari } from "react-device-detect";
 
 export const getDevices = async (): Promise<MediaDeviceInfo[]> => {
   const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+  console.log(
+    "get",
+    mediaDevices.filter((m) => m.kind === "videoinput"),
+  );
   let videoDevices: MediaDeviceInfo[] = [];
 
   const clusteredByFacingMode = mediaDevices
@@ -64,10 +68,11 @@ export function getConstraints(videoDevice: InputDeviceInfo | null) {
 
   return {
     video: {
-      ...(videoDevice ? { deviceId: videoDevice?.deviceId } : {}),
-      frameRate: { ideal: 30 },
-      width: { ideal: VIDEO_WIDTH },
-      height: { ideal: VIDEO_HEIGHT },
+      deviceId: { exact: videoDevice?.deviceId },
+      // ...(videoDevice ? { deviceId: videoDevice?.deviceId } : {}),
+      // frameRate: { ideal: 30 },
+      // width: { ideal: VIDEO_WIDTH },
+      // height: { ideal: VIDEO_HEIGHT },
     },
     audio: true,
   };

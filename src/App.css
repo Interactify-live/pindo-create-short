@@ -1,8 +1,8 @@
 html,
 body {
   overscroll-behavior: none;
-  touch-action: none; /* Optional: disables all gestures */
-  overflow: hidden; /* Prevents scroll entirely */
+  touch-action: none;
+  /* overflow: hidden; */
   margin: 0;
   height: 100vh;
 }

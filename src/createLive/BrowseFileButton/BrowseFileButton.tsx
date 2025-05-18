@@ -12,7 +12,7 @@ function BrowseFileButton({ onSelect, disabled }: Props) {
     }
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "video/mp4";
+    input.accept = "video/*,image/*";
     input.click();
     input.oninput = () => {
       if (input.files && input.files.length > 0) {

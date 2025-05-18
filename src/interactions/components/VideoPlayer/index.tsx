@@ -4,6 +4,7 @@ import {
   useCallback,
   useRef,
   useState,
+  useEffect,
 } from "react";
 import { MultipleNativePlayer } from "../MultipleNativePlayer";
 import { InteractionView } from "./InteractionView";
@@ -50,20 +51,24 @@ function VideoPlayer({
   }, []);
 
   const onToggleVideoClick = useCallback(() => {
-    if (!videoRef.current) {
-      return;
-    }
+    if (!videoRef.current) return;
 
     if (isPlaying) {
       videoRef.current.pause();
     } else {
       videoRef.current.play();
     }
-    setIsPlaying((prev) => !prev); // Optimized state update
+    setIsPlaying((prev) => !prev);
   }, [isPlaying]);
 
   return (
-    <div style={{ width: "100%", height: "100%" }}>
+    <div
+      style={{
+        width: "100%",
+        height: "calc(100dvh - 105px)",
+        overflow: "hidden",
+      }}
+    >
       <Draggable.Container>
         {({ ref }) => (
           <div
@@ -77,8 +82,8 @@ function VideoPlayer({
               position: "relative",
               overflow: "hidden",
               width: "100%",
-              maxWidth: "auto",
-              height: "calc(100vh - 92px)",
+              height: "100%",
+              maxHeight: "100%",
             }}
           >
             {media &&
@@ -112,29 +117,28 @@ function VideoPlayer({
               />
             ) : (
               <img
-                src={media && media.data.src}
+                src={media?.data?.src}
                 style={{
                   width: "100%",
                   height: "100%",
+                  maxHeight: "100%",
                   objectFit: "contain",
                   backgroundColor: "black",
                 }}
               />
             )}
-            {medias &&
-              medias[activeMedia] &&
-              medias[activeMedia].interactions.map((interaction, index) => (
-                <InteractionView
-                  key={index}
-                  index={index}
-                  interaction={interaction}
-                  medias={medias}
-                  setMedias={setMedias}
-                  activeMedia={activeMedia}
-                  activeInteraction={activeInteraction}
-                  setActiveInteraction={setActiveInteraction}
-                />
-              ))}
+            {medias?.[activeMedia]?.interactions.map((interaction, index) => (
+              <InteractionView
+                key={index}
+                index={index}
+                interaction={interaction}
+                medias={medias}
+                setMedias={setMedias}
+                activeMedia={activeMedia}
+                activeInteraction={activeInteraction}
+                setActiveInteraction={setActiveInteraction}
+              />
+            ))}
           </div>
         )}
       </Draggable.Container>
