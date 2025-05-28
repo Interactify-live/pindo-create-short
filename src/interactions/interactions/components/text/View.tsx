@@ -35,7 +35,7 @@ function View({
     <div
       onClick={onClick?.bind(null, payload)}
       style={{
-        whiteSpace: "nowrap",
+        whiteSpace: "pre-wrap",
         fontSize: payload.size,
         background: payload.background,
         color: payload.color,

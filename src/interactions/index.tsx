@@ -3,7 +3,7 @@ import { INTERACTIONS_CONTAINER_BASE_WIDTH } from "../shared/constants";
 import { Interaction } from "./components/Interactions";
 import { InteractionsContainer } from "./components/InteractionsContainer";
 import { VideoPlayer } from "./components/VideoPlayer";
-import { Media, Video, Image, VideoType } from "./types.d/types";
+import { Media, Video, Image, VideoType, ImageType } from "./types.d/types";
 import CloseButton from "../createLive/CloseButton/CloseButton";
 import { useEffect, useState } from "react";
 import Trash from "../icons/trash";
@@ -105,7 +105,15 @@ function ShortCreateInteractionsStep({
         }}
       >
         {hasAnyActiveInteraction ? (
-          <>
+          <div
+            style={{
+              marginTop: "15px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
             <button
               color="white"
               style={{ background: "none", border: "none", opacity: 50 }}
@@ -125,17 +133,17 @@ function ShortCreateInteractionsStep({
                 fontSize: "14px",
                 cursor: "pointer",
                 marginRight: "25px",
+                marginLeft: "auto",
               }}
               onClick={onSaveActiveInteraction}
             >
               تایید
             </button>
-          </>
+          </div>
         ) : (
           <div
             style={{
               display: "flex",
-              alignItems: "center",
               width: "100%",
               position: "relative",
             }}
@@ -143,16 +151,69 @@ function ShortCreateInteractionsStep({
             {/* Left - InteractionsContainer */}
             <div>
               {medias[activeMedia] && medias[activeMedia].interactions && (
-                <InteractionsContainer
-                  activeInteraction={activeInteraction}
-                  setActiveInteraction={setActiveInteraction}
-                  medias={medias}
-                  setMedias={setMedias}
-                  activeMedia={activeMedia}
-                  style={{ width: INTERACTIONS_CONTAINER_BASE_WIDTH }}
-                  onAddInteraction={onAddInteraction}
-                  onDelete={onDeleteActiveInteraction}
-                />
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      background: "rgba(255, 255,255, 0.3)",
+                      borderRadius: "15px",
+                    }}
+                    onClick={() => {
+                      setMedias((prev) => {
+                        const updated = prev.filter(
+                          (_, i) => i !== activeMedia,
+                        );
+                        // Handle activeMedia adjustment
+                        if (updated.length === 0) {
+                          setInteractionStep(false);
+                        } else {
+                          console.log("INO", activeMedia);
+                          if (activeMedia > 0) {
+                            setActiveMedia(activeMedia - 1);
+                          } else {
+                            setActiveMedia(0);
+                          }
+                        }
+                        return updated;
+                      });
+                    }}
+                  >
+                    <Trash />
+                  </div>
+                  <div
+                    style={{
+                      marginTop: "25px",
+                      width: "48px",
+                      height: "48px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      background: "rgba(255, 255,255, 0.3)",
+                      borderRadius: "15px",
+                    }}
+                  >
+                    <InteractionsContainer
+                      activeInteraction={activeInteraction}
+                      setActiveInteraction={setActiveInteraction}
+                      medias={medias}
+                      setMedias={setMedias}
+                      activeMedia={activeMedia}
+                      style={{ width: INTERACTIONS_CONTAINER_BASE_WIDTH }}
+                      onAddInteraction={onAddInteraction}
+                      onDelete={onDeleteActiveInteraction}
+                    />
+                  </div>
+                </div>
               )}
             </div>
 
@@ -166,19 +227,43 @@ function ShortCreateInteractionsStep({
                 right: 0,
                 margin: "0 auto",
                 pointerEvents: "none",
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "10px",
               }}
             >
-              انتشار آگهی
+              <div
+                style={{
+                  background: "rgba(255, 255, 255, 0.3)",
+                  display: "block",
+                  width: "100px",
+                  padding: "5px",
+                  borderRadius: "15px",
+                }}
+              >
+                انتشار آگهی
+              </div>
             </div>
 
             {/* Right - CloseButton */}
-            <div style={{ marginLeft: "auto", marginRight: "20px" }}>
-              <CloseButton />
+            <div
+              style={{
+                marginLeft: "auto",
+                marginRight: "20px",
+              }}
+            >
+              <div
+                style={{
+                  background: "rgba(255, 255,255, 0.3)",
+                  borderRadius: "15px",
+                }}
+              >
+                <CloseButton />
+              </div>
             </div>
           </div>
         )}
       </div>
-
       {/* Video - fills remaining space */}
       <div
         style={{
@@ -204,6 +289,7 @@ function ShortCreateInteractionsStep({
             width: "100%",
             height: "40px",
             alignItems: "center",
+            color: "white",
           }}
         >
           <div
@@ -234,29 +320,45 @@ function ShortCreateInteractionsStep({
                 )}
               </button>
             </div>
-            <div style={{ marginLeft: "auto" }}>
-              <button
-                style={{
-                  background: "rgba(37, 79, 195, 1)",
-                  color: "white",
-                  border: "none",
-                  width: "100px",
-                  height: "40px",
-                  borderRadius: "5px",
-                }}
-              >
-                ادامه
-              </button>
+            <div
+              style={{
+                marginLeft: "auto",
+              }}
+            >
+              <div>
+                <button
+                  style={{
+                    background: "rgba(37, 79, 195, 1)",
+                    color: "white",
+                    border: "none",
+                    width: "100px",
+                    height: "40px",
+                    borderRadius: "5px",
+                  }}
+                >
+                  ادامه
+                </button>
+              </div>
+              <div style={{ color: "white", display: "flex" }}>
+                <div
+                  style={{
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    marginTop: "5px",
+                  }}
+                >
+                  {medias.filter((m) => m.fileType === ImageType).length}/10
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
       <div
         style={{
           width: "100%",
           flexShrink: 0,
-          height: "105px",
+          height: "90px",
           background: "black",
           paddingBottom: "13px",
           display: "flex",
@@ -331,7 +433,10 @@ function ShortCreateInteractionsStep({
                           // objectFit: "cover",
                           borderRadius: "4px",
                         }}
-                        onClick={() => setActiveMedia(idx)}
+                        onClick={() => {
+                          setActiveMedia(idx);
+                          setActiveInteraction(-1);
+                        }}
                       />
                     </div>
                   ) : (
@@ -342,66 +447,12 @@ function ShortCreateInteractionsStep({
                         background: "#ccc",
                         borderRadius: "4px",
                       }}
-                      onClick={() => setActiveMedia(idx)}
+                      onClick={() => {
+                        setActiveMedia(idx);
+                        setActiveInteraction(-1);
+                      }}
                     ></div>
                   )}
-                  <button
-                    style={{
-                      position: "absolute",
-                      top: "-4px",
-                      right: "-4px",
-                      background: "rgba(211, 47, 47, 1)",
-                      border: "none",
-                      borderRadius: "50%",
-                      zIndex: 999,
-                      width: "16px",
-                      height: "16px",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      cursor: "pointer",
-                      padding: 0,
-                    }}
-                    onClick={() => {
-                      setMedias((prev) => {
-                        const updated = prev.filter((_, i) => i !== idx);
-                        console.log("IDX", idx);
-                        console.log("ACTIVE", activeMedia);
-                        console.log("UPDATED", updated);
-
-                        // Handle activeMedia adjustment
-                        if (updated.length === 0) {
-                          setInteractionStep(false);
-                        } else if (idx === activeMedia) {
-                          // Set activeMedia to a valid index after deletion
-                          const newIndex = Math.max(0, idx - 1);
-                          console.log("CURRENT INDEX", activeMedia);
-                          console.log("NEW INDEX", Math.max(0, idx - 1));
-                          console.log("BEFORE", medias);
-                          console.log("AFTER", updated);
-                          setActiveMedia(newIndex);
-                        } else {
-                          setActiveMedia(activeMedia - 1);
-                        }
-                        return updated;
-                      });
-                    }}
-                  >
-                    <svg
-                      width="8"
-                      height="8"
-                      viewBox="0 0 8 8"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M1 1L7 7M7 1L1 7"
-                        stroke="white"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
                 </div>
               );
             }
@@ -413,79 +464,27 @@ function ShortCreateInteractionsStep({
                   width: "fit-content",
                   height: "fit-content",
                   margin: "4px",
+                  borderRadius: "4px",
                 }}
                 key={idx}
               >
                 <img
-                  onClick={() => setActiveMedia(idx)}
+                  onClick={() => {
+                    setActiveMedia(idx);
+                    setActiveInteraction(-1);
+                  }}
                   src={image.src}
                   alt="image"
                   style={{
                     width: "42px",
                     height: "42px",
                     objectFit: "cover",
-                    borderRadius: "4px",
+                    boxSizing: "border-box",
+                    border: idx === activeMedia ? "4px solid green" : "none",
+                    borderRadius: idx === activeMedia ? "none" : "4px",
                     display: "block",
                   }}
                 />
-
-                <button
-                  style={{
-                    position: "absolute",
-                    top: "-4px",
-                    right: "-4px",
-                    background: "rgba(211, 47, 47, 1)",
-                    border: "none",
-                    borderRadius: "50%",
-                    zIndex: 999,
-                    width: "16px",
-                    height: "16px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    cursor: "pointer",
-                    padding: 0,
-                  }}
-                  onClick={() => {
-                    setMedias((prev) => {
-                      const updated = prev.filter((_, i) => i !== idx);
-                      console.log("IDX", idx);
-                      console.log("ACTIVE", activeMedia);
-                      console.log("UPDATED", updated);
-
-                      // Handle activeMedia adjustment
-                      if (updated.length === 0) {
-                        setInteractionStep(false);
-                      } else if (idx === activeMedia) {
-                        // Set activeMedia to a valid index after deletion
-                        const newIndex = Math.max(0, idx - 1);
-                        console.log("CURRENT INDEX", activeMedia);
-                        console.log("NEW INDEX", Math.max(0, idx - 1));
-                        console.log("BEFORE", medias);
-                        console.log("AFTER", updated);
-                        setActiveMedia(newIndex);
-                      } else {
-                        setActiveMedia(activeMedia - 1);
-                      }
-                      return updated;
-                    });
-                  }}
-                >
-                  <svg
-                    width="8"
-                    height="8"
-                    viewBox="0 0 8 8"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M1 1L7 7M7 1L1 7"
-                      stroke="white"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
               </div>
             );
           })}
@@ -555,8 +554,8 @@ function ShortCreateInteractionsStep({
               });
 
               // Update activeInteraction to the new interaction's index
-              const active = medias[activeMedia].interactions.length;
-              setActiveInteraction(active);
+              // const active = medias[activeMedia].interactions.length;
+              // setActiveInteraction(active);
 
               setShowOverlay(false);
               setOverlayInput("");

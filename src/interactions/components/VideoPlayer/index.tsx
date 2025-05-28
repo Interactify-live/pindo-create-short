@@ -4,7 +4,6 @@ import {
   useCallback,
   useRef,
   useState,
-  useEffect,
 } from "react";
 import { MultipleNativePlayer } from "../MultipleNativePlayer";
 import { InteractionView } from "./InteractionView";
@@ -112,7 +111,6 @@ function VideoPlayer({
                 onEnded={onVideoEnded}
                 ref={videoRef}
                 sources={[media.data]}
-                loop
                 onClick={onVideoClick}
               />
             ) : (

@@ -1,56 +1,63 @@
 import { isMobile, isSafari } from "react-device-detect";
 
 export const getDevices = async (): Promise<MediaDeviceInfo[]> => {
-  const mediaDevices = await navigator.mediaDevices.enumerateDevices();
-  console.log(
-    "get",
-    mediaDevices.filter((m) => m.kind === "videoinput"),
-  );
-  let videoDevices: MediaDeviceInfo[] = [];
+  console.log("RUNCOUNT");
 
-  const clusteredByFacingMode = mediaDevices
-    .filter((mediaDevice) => mediaDevice.kind === "videoinput")
-    .map(
-      (mediaDevice: any) =>
-        [
-          mediaDevice.getCapabilities?.()?.facingMode?.[0] || "unknown",
-          mediaDevice,
-        ] as const,
-    )
-    .reduce(
-      (cluster: any, [facingMode, mediaDevice]) => ({
-        ...cluster,
-        [facingMode]: [...(cluster[facingMode] || []), mediaDevice],
-      }),
-      {},
-    );
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
 
-  for (const facingMode in clusteredByFacingMode) {
-    const cluster = clusteredByFacingMode[facingMode];
+    const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+    console.log("MEDIADEVICES", mediaDevices);
 
-    if (facingMode === "unknown") {
-      videoDevices = videoDevices.concat(cluster);
-      continue;
-    }
+    const videoDevicesGrouped: Record<string, MediaDeviceInfo[]> = {
+      user: [],
+      environment: [],
+      unknown: [],
+    };
 
-    let selectedItem: MediaDeviceInfo | null = null;
-    let selectedItemWidth = Infinity;
-    for (const clusterItem of cluster) {
-      const capabilities = clusterItem.getCapabilities?.();
-      const clusterItemWidth = capabilities?.width?.max ?? Infinity;
+    for (const device of mediaDevices) {
+      if (device.kind !== "videoinput") continue;
 
-      if (clusterItemWidth <= selectedItemWidth) {
-        selectedItem = clusterItem;
-        selectedItemWidth = clusterItemWidth;
+      let facing: "user" | "environment" | "unknown" = "unknown";
+
+      const label = device.label.toLowerCase();
+
+      if (label.includes("front")) {
+        facing = "user";
+      } else if (label.includes("back")) {
+        facing = "environment";
       }
+
+      videoDevicesGrouped[facing].push(device);
     }
 
-    if (selectedItem !== null) {
-      videoDevices.push(selectedItem);
+    console.log("GROUPED BY FACING", videoDevicesGrouped);
+
+    const videoDevices: MediaDeviceInfo[] = [];
+
+    if (videoDevicesGrouped.environment.length > 0) {
+      videoDevices.push(videoDevicesGrouped.environment[0]);
     }
+
+    if (videoDevicesGrouped.user.length > 0) {
+      videoDevices.push(videoDevicesGrouped.user[0]);
+    }
+
+    if (videoDevicesGrouped.unknown.length > 0) {
+      videoDevices.push(videoDevicesGrouped.unknown[0]);
+    }
+
+    stream.getTracks().forEach((t) => t.stop());
+
+    console.log("COUNT HERE");
+    return videoDevices;
+  } catch (err) {
+    console.error("Failed to access media devices", err);
+    return []; // ✅ Fix: Return fallback to match function return type
   }
-
-  return videoDevices;
 };
 
 export function getConstraints(videoDevice: InputDeviceInfo | null) {
@@ -69,6 +76,7 @@ export function getConstraints(videoDevice: InputDeviceInfo | null) {
   return {
     video: {
       deviceId: { exact: videoDevice?.deviceId },
+      // deviceId: { exact: videoDevice?.deviceId },
       // ...(videoDevice ? { deviceId: videoDevice?.deviceId } : {}),
       // frameRate: { ideal: 30 },
       // width: { ideal: VIDEO_WIDTH },

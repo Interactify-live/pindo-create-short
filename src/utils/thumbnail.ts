@@ -1,38 +1,82 @@
-export const generateThumbnailFromFile = async (
-  file: File,
-): Promise<string> => {
-  return new Promise((resolve) => {
-    const videoEl = document.createElement("video");
+export const generateThumbnailFromFile = async (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    console.log("[Thumbnail] Starting thumbnail generation...");
 
-    videoEl.src = URL.createObjectURL(file);
+    const videoEl = document.createElement("video");
+    const objectUrl = URL.createObjectURL(file);
+    videoEl.src = objectUrl;
     videoEl.crossOrigin = "anonymous";
     videoEl.muted = true;
-    videoEl.currentTime = 0; // Initial seek to 0 (optional)
+    videoEl.playsInline = true;
+    videoEl.preload = "auto";
 
-    videoEl.addEventListener("loadeddata", () => {
-      videoEl.currentTime = 0; // Ensure the video is at the start point
+    const canvas = document.createElement("canvas");
+    canvas.width = 42;
+    canvas.height = 42;
 
-      // Wait until the video has actually seeked to the right position
-      videoEl.addEventListener("seeked", () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = 42;
-        canvas.height = 42;
-        const ctx = canvas.getContext("2d");
+    const cleanup = () => {
+      console.log("[Thumbnail] Cleaning up");
+      URL.revokeObjectURL(objectUrl);
+      videoEl.remove();
+      canvas.remove();
+    };
 
-        if (ctx) {
-          ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
-          const thumbnailUrl = canvas.toDataURL("image/png");
-          resolve(thumbnailUrl);
-        } else {
-          resolve(""); // fallback in case of failure
-        }
+    const fail = (reason: string) => {
+      console.error("[Thumbnail] Failed:", reason);
+      cleanup();
+      reject(new Error(reason));
+    };
 
-        URL.revokeObjectURL(videoEl.src); // cleanup
-      });
+    videoEl.addEventListener("error", (e) => {
+      fail(`video error: ${e}`);
     });
 
-    videoEl.addEventListener("error", () => {
-      resolve(""); // in case of error
+    videoEl.addEventListener("loadedmetadata", () => {
+      console.log("[Thumbnail] Metadata loaded. Duration:", videoEl.duration);
+    });
+
+    videoEl.addEventListener("loadeddata", async () => {
+      console.log("[Thumbnail] Data loaded");
+      try {
+        await videoEl.play().catch(() => {}); // play to force frame load
+        videoEl.pause();
+        const seekTo = Math.min(0.1, videoEl.duration || 1);
+        videoEl.currentTime = seekTo;
+      } catch (err) {
+        fail("Exception in loadeddata: " + err);
+      }
+    });
+
+    const captureFrame = () => {
+      console.log("[Thumbnail] Attempting to capture frame");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return fail("No canvas context");
+
+      try {
+        ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          if (!blob) return fail("Failed to create blob from canvas");
+          const thumbnailFile = new File([blob], "thumbnail.png", {
+            type: "image/png",
+          });
+          console.log("[Thumbnail] Capture success");
+          cleanup();
+          resolve(thumbnailFile);
+        }, "image/png");
+      } catch (e) {
+        fail("drawImage failed: " + e);
+      }
+    };
+
+    videoEl.addEventListener("seeked", () => {
+      console.log("[Thumbnail] Seeked event fired");
+      captureFrame();
+    });
+
+    videoEl.addEventListener("timeupdate", function handleTimeUpdate() {
+      console.log("[Thumbnail] timeupdate fired as fallback");
+      videoEl.removeEventListener("timeupdate", handleTimeUpdate);
+      captureFrame();
     });
   });
 };

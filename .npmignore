@@ -1,0 +1,7 @@
+/src
+/public
+*.config.js
+*.conf
+Dockerfile
+*.md
+*.lock

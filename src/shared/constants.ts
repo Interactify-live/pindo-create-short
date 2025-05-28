@@ -9,7 +9,7 @@ const VIDEO_INDEX_COLORS = [
   "#02C5C5",
   "#A5A73F",
 ];
-const VIDEO_MAX_DURATION = 60; // in seconds
+const VIDEO_MAX_DURATION = 70; // in seconds
 const INTERACTIONS_CONTAINER_BASE_WIDTH = 360;
 
 export { INTERACTIONS_CONTAINER_BASE_WIDTH };

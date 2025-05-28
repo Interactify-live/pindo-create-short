@@ -7,17 +7,23 @@ import CloseButton from "./CloseButton/CloseButton";
 import {
   FileType,
   ImageType,
+  Media,
   Video,
   VideoType,
 } from "../interactions/types.d/types";
 import { getConstraints, getDevices } from "../utils/camera";
 import { VIDEO_MAX_DURATION } from "../shared/constants";
+import { generateThumbnailFromFile } from "../utils/thumbnail";
+import { getMediaDuration } from "../shared/utils";
 
 interface Props {
-  onSelect: (file: File, mediaType: FileType) => void;
+  onSelect: (file: File, mediaType: FileType, thumb: any | null) => void;
+  showToast: any;
+  medias: Media[];
+  setIsInteractionStep: any;
 }
 
-function Capture({ onSelect }: Props) {
+function Capture({ onSelect, showToast, medias, setIsInteractionStep }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const recordButtonRef = useRef<ComponentRef<typeof RecordButton>>(null);
   const [captureType, setCaptureType] = useState<FileType>(ImageType);
@@ -37,14 +43,17 @@ function Capture({ onSelect }: Props) {
   const [mediaStream, setMediaStream] = useState<null | MediaStream>(null);
   const startVideo = async () => {
     try {
+      // if (mediaStream) {
+      //   mediaStream.getTracks().forEach((track) => track.stop());
+      // }
       const stream = await navigator.mediaDevices.getUserMedia(
         getConstraints(videoDevices[videoDeviceIndex]),
       );
-      console.log("index", videoDeviceIndex);
+      console.log("index", videoDeviceIndex, videoDevices[videoDeviceIndex]);
       setMediaStream(stream);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        initialize(videoRef.current);
+        initialize(videoRef.current, stream);
       }
       return stream;
     } catch (e) {
@@ -53,7 +62,7 @@ function Capture({ onSelect }: Props) {
     }
   };
 
-  const stopVideo = (stream = mediaStream) => {
+  const stopVideo = async (stream = mediaStream) => {
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
     }
@@ -66,10 +75,11 @@ function Capture({ onSelect }: Props) {
     let isUnmounted = false;
     let mediaStream: MediaStream | null = null;
 
-    stopVideo(mediaStream);
-    startVideo().then((stream) => {
-      mediaStream = stream;
-      if (isUnmounted) stopVideo(stream);
+    stopVideo(mediaStream).then(() => {
+      startVideo().then((stream) => {
+        mediaStream = stream;
+        if (isUnmounted) stopVideo(stream);
+      });
     });
 
     return () => {
@@ -86,17 +96,49 @@ function Capture({ onSelect }: Props) {
   const maxRecordableDuration =
     Math.max(VIDEO_MAX_DURATION - totalVideosDuration, 0) * 1000;
 
-  const { record, stop, isRecording, takePhoto, initialize } = useMediaRecorder(
-    {
+  const { record, stop, clear, isRecording, takePhoto, initialize } =
+    useMediaRecorder({
+      maxDuration: VIDEO_MAX_DURATION * 1000,
       onRecordStart: () =>
         recordButtonRef.current?.start(maxRecordableDuration),
-      onRecordEnd: (file) => {
-        recordButtonRef.current?.stop();
-        onSelect(file, VideoType);
+      onRecordEnd: async (videoFile, thumbnailFile) => {
+        getMediaDuration(videoFile).then((duration) => {
+          if (medias.filter((m) => m.fileType === VideoType).length >= 1) {
+            showToast("شما حداکثر یک ویدیو می توانید داشته باشید");
+            if (videoRef.current && mediaStream) {
+              initialize(videoRef.current, mediaStream);
+              recordButtonRef.current?.stop();
+              return;
+            }
+          }
+          if (duration < 5 || duration > 70) {
+            showToast("ویدیو باید بیشتر از ۵ و کمتر از ۷۰ ثانیه باشد");
+            if (videoRef.current && mediaStream) {
+              initialize(videoRef.current, mediaStream);
+              recordButtonRef.current?.stop();
+            }
+          } else {
+            clear();
+            onSelect(videoFile, VideoType, thumbnailFile); // 🟢 All in one place
+          }
+        });
       },
-      onPhotoTaken: (file) => onSelect(file, ImageType),
-    },
-  );
+      onPhotoTaken: (f) => {
+        console.log("TOOK", f);
+
+        // Check existing media
+        const existingImageCount = medias.filter(
+          (file) => file.fileType !== VideoType,
+        ).length;
+
+        const totalImagesAfterAdd = existingImageCount + 1;
+        if (totalImagesAfterAdd > 10) {
+          showToast(`شما حداکثر ۱۰ تصویر می توانید داشته باشید`);
+        } else {
+          onSelect(f, ImageType, null); // 🟢 All in one place
+        }
+      },
+    });
 
   const onSwitchCameraClick = () => {
     setVideoDeviceIndex((index) => (index + 1) % videoDevices.length);
@@ -125,7 +167,26 @@ function Capture({ onSelect }: Props) {
           <div>
             <FlashButton />
           </div>
-          <div style={{ flex: 1, textAlign: "center" }}>انتشار آگهی</div>
+          <div
+            style={{
+              flex: 1,
+              textAlign: "center",
+              justifyContent: "center",
+              display: "flex",
+            }}
+          >
+            <div
+              style={{
+                background: "rgba(255, 255, 255, 0.3)",
+                display: "block",
+                width: "100px",
+                padding: "5px",
+                borderRadius: "15px",
+              }}
+            >
+              انتشار آگهی
+            </div>
+          </div>
           <div>
             <CloseButton />
           </div>
@@ -177,36 +238,67 @@ function Capture({ onSelect }: Props) {
               marginTop: "auto",
               marginBottom: "24px",
               display: "flex",
-              justifyContent: "center",
+              justifyContent: "center", // Center the main content
               alignItems: "center",
+              position: "relative", // Needed for absolute positioning of the last button
             }}
           >
-            <button
-              style={{
-                background: captureType === VideoType ? "white" : "transparent",
-                fontSize: "14px",
-                borderRadius: "14px",
-                padding: "5px 12px",
-                border: "none",
-                fontWeight: "bold",
-              }}
-              onClick={() => setCaptureType(VideoType)}
-            >
-              ویدئو
-            </button>
-            <button
-              style={{
-                background: captureType === ImageType ? "white" : "transparent",
-                fontSize: "14px",
-                borderRadius: "14px",
-                padding: "5px 12px",
-                border: "none",
-                fontWeight: "bold",
-              }}
-              onClick={() => setCaptureType(ImageType)}
-            >
-              عکس
-            </button>
+            {/* Center group for the two buttons */}
+            <div style={{ display: "flex", gap: "5px" }}>
+              <button
+                style={{
+                  background:
+                    captureType === VideoType
+                      ? "white"
+                      : "rgba(255,255,255,0.3)",
+                  fontSize: "14px",
+                  borderRadius: "14px",
+                  padding: "5px 12px",
+                  border: "none",
+                  fontWeight: "bold",
+                  color: "black",
+                }}
+                onClick={() => setCaptureType(VideoType)}
+              >
+                ویدئو
+              </button>
+              <button
+                style={{
+                  background:
+                    captureType === ImageType
+                      ? "white"
+                      : "rgba(255,255,255,0.3)",
+                  fontSize: "14px",
+                  borderRadius: "14px",
+                  padding: "5px 12px",
+                  border: "none",
+                  fontWeight: "bold",
+                  color: "black",
+                }}
+                onClick={() => setCaptureType(ImageType)}
+              >
+                عکس
+              </button>
+            </div>
+
+            {/* Continue button positioned absolutely on the right */}
+            {medias.length > 0 && (
+              <button
+                style={{
+                  background: "rgba(37, 79, 195, 1)",
+                  color: "white",
+                  border: "none",
+                  width: "100px",
+                  height: "40px",
+                  borderRadius: "5px",
+                  position: "absolute",
+                  right: "20px", // Position on the right edge
+                }}
+                onClick={() => setIsInteractionStep(true)}
+              >
+                بازگشت
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -234,8 +326,25 @@ function Capture({ onSelect }: Props) {
           }}
         >
           <BrowseFileButton
+            medias={medias}
             disabled={isRecording}
-            onSelect={(file: File) => onSelect(file, VideoType)}
+            showToast={showToast}
+            onSelect={async (files: File[]) => {
+              for (const file of files) {
+                const type = file.type;
+                const isVideo = type.startsWith("video/");
+                const isImage = type.startsWith("image/");
+
+                if (isVideo) {
+                  const thumb = await generateThumbnailFromFile(file);
+                  onSelect(file, VideoType, thumb); // this is your own handler
+                } else if (isImage) {
+                  onSelect(file, ImageType, null);
+                } else {
+                  console.warn("Unsupported file type:", type);
+                }
+              }
+            }}
           />
         </div>
 

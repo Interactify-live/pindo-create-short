@@ -233,6 +233,7 @@ function DraggableItem({
         top: geometric.y,
         width: resizable ? geometric.width : "auto",
         height: resizable ? geometric.height : "auto",
+        zIndex: 1000,
       }}
     >
       {resizable && (
