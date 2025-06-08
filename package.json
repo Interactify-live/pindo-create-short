@@ -1,7 +1,8 @@
 {
   "name": "@livuvo/short-sdk-wizard",
-  "version": "0.7.9",
-  "main": "dist/index.js",
+  "version": "0.7.13",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
@@ -16,7 +17,7 @@
   "scripts": {
     "start": "react-scripts start",
     "mock": "node src/mock/generate-mock.js",
-    "build": "rm -rf ./dist && webpack --config webpack.config.js",
+    "build": "rm -rf ./dist && webpack --config webpack.config.js && tsc --emitDeclarationOnly",
     "local-publish": "npm publish --access public",
     "prepublishOnly": "npm run build",
     "test": "react-scripts test",
@@ -41,7 +42,8 @@
     ]
   },
   "peerDependencies": {
-    "react": ">=18.2.0 <20"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.22.4",
@@ -77,5 +79,9 @@
     "web-vitals": "^2.1.4",
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1"
+  },
+  "resolutions": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   }
 }
