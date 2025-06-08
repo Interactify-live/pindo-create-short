@@ -1,3 +1,4 @@
+import React from "react";
 import { isMobile, isSafari } from "react-device-detect";
 
 export const getDevices = async (): Promise<MediaDeviceInfo[]> => {

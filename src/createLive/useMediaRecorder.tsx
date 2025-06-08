@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 
 function getSupportedMimeType() {
   const VIDEO_CODECS = ["h.264", "h264", "vp8", "vp9", "h265", "h.265"];
@@ -8,11 +8,11 @@ function getSupportedMimeType() {
     VIDEO_CODECS.map((codec) => [
       `${mimeType};codecs=${codec}`,
       `${mimeType};codecs=${codec.toUpperCase()}`,
-    ]),
+    ])
   ).flat(2);
 
   const supported = COMBINATIONS.find((mimeType) =>
-    MediaRecorder.isTypeSupported(mimeType),
+    MediaRecorder.isTypeSupported(mimeType)
   );
 
   if (supported) return supported;
@@ -53,7 +53,7 @@ function useMediaRecorder({
 
   const initialize = async (
     videoElement: HTMLVideoElement,
-    stream: MediaStream,
+    stream: MediaStream
   ) => {
     videoRef.current = videoElement;
     try {
@@ -73,7 +73,7 @@ function useMediaRecorder({
       await new Promise((resolve) =>
         videoRef.current?.addEventListener("loadeddata", resolve, {
           once: true,
-        }),
+        })
       );
     }
 
@@ -127,7 +127,7 @@ function useMediaRecorder({
         `recorded-video.${fileExtension}`,
         {
           type: mimeType,
-        },
+        }
       );
 
       onRecordEnd(videoFile, photoFile!);

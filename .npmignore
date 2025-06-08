@@ -5,3 +5,9 @@
 Dockerfile
 *.md
 *.lock
+.gitignore
+.eslintrc
+.prettierrc
+**/*.test.*
+**/__tests__
+**/__mocks__

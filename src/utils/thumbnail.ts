@@ -1,3 +1,4 @@
+import React from "react";
 export const generateThumbnailFromFile = async (file: File): Promise<File> => {
   return new Promise((resolve, reject) => {
     console.log("[Thumbnail] Starting thumbnail generation...");

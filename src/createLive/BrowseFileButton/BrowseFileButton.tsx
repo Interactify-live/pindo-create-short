@@ -1,3 +1,4 @@
+import React from "react";
 import { Media, VideoType } from "../../interactions/types.d/types";
 
 interface Props {
@@ -26,15 +27,15 @@ function BrowseFileButton({ onSelect, disabled, showToast, medias }: Props) {
         let images = files.filter(
           (file) =>
             file.type.startsWith("image/") &&
-            ["image/jpeg", "image/png"].includes(file.type),
+            ["image/jpeg", "image/png"].includes(file.type)
         );
 
         // Check existing media
         const hasExistingVideo = medias.some(
-          (file) => file.fileType === VideoType,
+          (file) => file.fileType === VideoType
         );
         const existingImageCount = medias.filter(
-          (file) => file.fileType !== VideoType,
+          (file) => file.fileType !== VideoType
         ).length;
 
         // Case 1: Trying to add multiple videos

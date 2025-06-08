@@ -1,3 +1,4 @@
+import React from "react";
 import { TextInteraction } from "./components/text";
 
 const INTERACTIONS = {

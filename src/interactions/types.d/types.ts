@@ -1,3 +1,4 @@
+import React from "react";
 import { RelativeGeometric } from "../draggable";
 import { Interaction } from "../interactions";
 

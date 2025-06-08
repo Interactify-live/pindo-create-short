@@ -1,4 +1,4 @@
-import {
+import React, {
   forwardRef,
   MouseEventHandler,
   useEffect,
@@ -104,7 +104,7 @@ const CaptureButton = forwardRef<Ref, Props>(
         ></div>
       </div>
     );
-  },
+  }
 );
 
 export default CaptureButton;

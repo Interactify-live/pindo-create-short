@@ -1,3 +1,4 @@
+import React from "react";
 import { ComponentProps } from "react";
 import { INTERACTIONS } from "../../../interactions";
 import { InteractionValidate } from "../../../types/interactionValidator";

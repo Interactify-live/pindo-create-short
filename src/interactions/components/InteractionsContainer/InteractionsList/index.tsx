@@ -1,3 +1,4 @@
+import React from "react";
 import classnames from "classnames";
 import { INTERACTIONS, Interaction } from "../../Interactions";
 import styles from "./styles.module.scss";

@@ -1,3 +1,4 @@
+import React from "react";
 const Validators = {
   url(key: string, value: string) {
     return /^https?:\/\/[a-z0-9_-]+\.[a-z0-9]+/.test(value.toLowerCase())

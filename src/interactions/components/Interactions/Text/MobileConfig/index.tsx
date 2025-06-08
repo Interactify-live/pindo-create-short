@@ -1,3 +1,4 @@
+import React from "react";
 import { Payload } from "../options";
 
 interface Props {

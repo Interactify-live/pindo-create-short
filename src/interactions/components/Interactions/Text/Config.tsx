@@ -1,3 +1,4 @@
+import React from "react";
 import { MobileConfig } from "./MobileConfig";
 import { Payload } from "./options";
 

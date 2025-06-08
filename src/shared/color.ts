@@ -1,3 +1,4 @@
+import React from "react";
 interface GColorRGB {
   r: number;
   g: number;

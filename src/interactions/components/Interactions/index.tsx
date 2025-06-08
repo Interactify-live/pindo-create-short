@@ -1,3 +1,4 @@
+import React from "react";
 // import * as ButtonInteraction from "./Button";
 // import * as HotspotInteraction from "./Hotspot";
 // import * as ProductInteraction from "./Product";

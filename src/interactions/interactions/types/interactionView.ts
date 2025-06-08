@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface InteractionView<Payload> {
   className?: string;
   payload: Payload;

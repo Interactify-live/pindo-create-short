@@ -1,4 +1,4 @@
-import { ComponentRef, useEffect, useRef, useState } from "react";
+import React, { ComponentRef, useEffect, useRef, useState } from "react";
 import { BrowseFileButton } from "./BrowseFileButton/BrowseFileButton";
 import useMediaRecorder from "./useMediaRecorder";
 import RecordButton from "./RecordButton/RecordButton";
@@ -47,7 +47,7 @@ function Capture({ onSelect, showToast, medias, setIsInteractionStep }: Props) {
       //   mediaStream.getTracks().forEach((track) => track.stop());
       // }
       const stream = await navigator.mediaDevices.getUserMedia(
-        getConstraints(videoDevices[videoDeviceIndex]),
+        getConstraints(videoDevices[videoDeviceIndex])
       );
       console.log("index", videoDeviceIndex, videoDevices[videoDeviceIndex]);
       setMediaStream(stream);
@@ -90,7 +90,7 @@ function Capture({ onSelect, showToast, medias, setIsInteractionStep }: Props) {
 
   const totalVideosDuration = videos.reduce(
     (totalDuration, video) => totalDuration + video.duration,
-    0,
+    0
   );
 
   const maxRecordableDuration =
@@ -128,7 +128,7 @@ function Capture({ onSelect, showToast, medias, setIsInteractionStep }: Props) {
 
         // Check existing media
         const existingImageCount = medias.filter(
-          (file) => file.fileType !== VideoType,
+          (file) => file.fileType !== VideoType
         ).length;
 
         const totalImagesAfterAdd = existingImageCount + 1;
