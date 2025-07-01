@@ -1,7 +1,19 @@
 import React from "react";
+
 export default function FlashButton() {
+  const handleClick = () => {
+    console.log("CLICKED");
+    if (window.ReactNativeWebView?.postMessage) {
+      console.log("MATCHED");
+      window.ReactNativeWebView.postMessage("toggle-flashlight");
+    } else {
+      console.warn("ReactNativeWebView not available");
+    }
+  };
+
   return (
     <button
+      onClick={handleClick}
       style={{
         width: "40px",
         height: "40px",

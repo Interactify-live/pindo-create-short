@@ -1,11 +1,22 @@
 import React, { useState } from "react";
 import ShortCreateInteractionsStep from "./interactions";
-import { FileType, Media, VideoType } from "./interactions/types.d/types";
-import "./App.css";
+import {
+  FileType,
+  Media,
+  MediaResult,
+  VideoType,
+} from "./interactions/types.d/types";
 import { getMediaDuration } from "./shared/utils";
 import Capture from "./createLive/Videos";
+declare global {
+  interface Window {
+    ReactNativeWebView?: {
+      postMessage: (message: string) => void;
+    };
+  }
+}
 
-function App() {
+function App(props: { onFinish: (medias: MediaResult[]) => void }) {
   const [medias, setMedias] = useState<Media[]>([]);
   const [coverIndex, setCoverIndex] = useState(0);
   const [isInteractionStep, setIsInteractionStep] = useState(false);
@@ -28,7 +39,7 @@ function App() {
           onSelect={async (
             f: File,
             mediaType: FileType,
-            thumb: File | null,
+            thumb: File | null
           ) => {
             if (mediaType === VideoType) {
               if (!thumb) return;
@@ -77,6 +88,7 @@ function App() {
           setMedias={setMedias}
           coverIndex={coverIndex}
           setCoverIndex={setCoverIndex}
+          onFinish={props.onFinish}
         />
       )}
       {toastMessage && (

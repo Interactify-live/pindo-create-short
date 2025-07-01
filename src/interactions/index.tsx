@@ -3,7 +3,15 @@ import { INTERACTIONS_CONTAINER_BASE_WIDTH } from "../shared/constants";
 import { Interaction } from "./components/Interactions";
 import { InteractionsContainer } from "./components/InteractionsContainer";
 import { VideoPlayer } from "./components/VideoPlayer";
-import { Media, Video, Image, VideoType, ImageType } from "./types.d/types";
+import {
+  Media,
+  Video,
+  Image,
+  VideoType,
+  ImageType,
+  MediaResult,
+  InteractionItemResult,
+} from "./types.d/types";
 import CloseButton from "../createLive/CloseButton/CloseButton";
 import { useEffect, useState } from "react";
 import Trash from "../icons/trash";
@@ -14,22 +22,24 @@ interface Props {
   setInteractionStep: React.Dispatch<React.SetStateAction<boolean>>;
   coverIndex: number;
   setCoverIndex: React.Dispatch<React.SetStateAction<number>>;
+  onFinish: (medias: MediaResult[]) => void;
 }
 
-function ShortCreateInteractionsStep({
+const ShortCreateInteractionsStep: React.FC<Props> = ({
   medias,
   setMedias,
   setInteractionStep,
   coverIndex,
   setCoverIndex,
-}: Props) {
+  onFinish,
+}: Props) => {
   const [activeInteraction, setActiveInteraction] = useState(-1);
   const hasAnyActiveInteraction = activeInteraction !== -1;
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayInput, setOverlayInput] = useState("");
   const [interaction, setInteraction] = useState<any>(null);
   const [activeMedia, setActiveMedia] = useState(
-    medias.length > 0 ? medias.length - 1 : 0,
+    medias.length > 0 ? medias.length - 1 : 0
   );
 
   useEffect(() => {
@@ -52,7 +62,7 @@ function ShortCreateInteractionsStep({
           return {
             ...media,
             interactions: media.interactions.filter(
-              (_, i) => i !== activeInteraction,
+              (_, i) => i !== activeInteraction
             ),
           };
         }
@@ -88,7 +98,6 @@ function ShortCreateInteractionsStep({
         flexDirection: "column",
       }}
     >
-      {/* Header */}
       <div
         style={{
           position: "absolute",
@@ -148,7 +157,6 @@ function ShortCreateInteractionsStep({
               position: "relative",
             }}
           >
-            {/* Left - InteractionsContainer */}
             <div>
               {medias[activeMedia] && medias[activeMedia].interactions && (
                 <div
@@ -171,9 +179,8 @@ function ShortCreateInteractionsStep({
                     onClick={() => {
                       setMedias((prev) => {
                         const updated = prev.filter(
-                          (_, i) => i !== activeMedia,
+                          (_, i) => i !== activeMedia
                         );
-                        // Handle activeMedia adjustment
                         if (updated.length === 0) {
                           setInteractionStep(false);
                         } else {
@@ -216,8 +223,6 @@ function ShortCreateInteractionsStep({
                 </div>
               )}
             </div>
-
-            {/* Center - انتشار آگهی */}
             <div
               style={{
                 flex: 1,
@@ -244,8 +249,6 @@ function ShortCreateInteractionsStep({
                 انتشار آگهی
               </div>
             </div>
-
-            {/* Right - CloseButton */}
             <div
               style={{
                 marginLeft: "auto",
@@ -264,7 +267,6 @@ function ShortCreateInteractionsStep({
           </div>
         )}
       </div>
-      {/* Video - fills remaining space */}
       <div
         style={{
           height: "100%",
@@ -327,6 +329,24 @@ function ShortCreateInteractionsStep({
             >
               <div>
                 <button
+                  onClick={() => {
+                    onFinish(
+                      medias.map((media): MediaResult => {
+                        return {
+                          ...media,
+                          interactions: media.interactions.map(
+                            (interactionItem): InteractionItemResult => {
+                              return {
+                                payload: interactionItem.payload,
+                                geometric: interactionItem.geometric,
+                                interaction: interactionItem.interaction.type, // Extract just the type string
+                              };
+                            }
+                          ),
+                        };
+                      })
+                    );
+                  }}
                   style={{
                     background: "rgba(37, 79, 195, 1)",
                     color: "white",
@@ -366,7 +386,6 @@ function ShortCreateInteractionsStep({
           alignItems: "center",
         }}
       >
-        {/* Left - افزودن عکس */}
         <div>
           <button
             onClick={() => setInteractionStep(false)}
@@ -400,7 +419,6 @@ function ShortCreateInteractionsStep({
           </button>
         </div>
 
-        {/* Right - items */}
         <div
           style={{
             display: "flex",
@@ -506,7 +524,6 @@ function ShortCreateInteractionsStep({
             alignItems: "center",
           }}
         >
-          {/* Submit button */}
           <button
             style={{
               position: "absolute",
@@ -532,7 +549,7 @@ function ShortCreateInteractionsStep({
                         JSON.stringify({
                           ...interaction.defaultPayload,
                           text: overlayInput,
-                        }),
+                        })
                       ),
                       geometric: makeGeometricRelative({
                         x: 50,
@@ -553,10 +570,6 @@ function ShortCreateInteractionsStep({
                 });
               });
 
-              // Update activeInteraction to the new interaction's index
-              // const active = medias[activeMedia].interactions.length;
-              // setActiveInteraction(active);
-
               setShowOverlay(false);
               setOverlayInput("");
             }}
@@ -564,9 +577,7 @@ function ShortCreateInteractionsStep({
             تایید
           </button>
 
-          {/* Centered text input */}
           <textarea
-            // type="text"
             value={overlayInput}
             onChange={(e) => setOverlayInput(e.target.value)}
             placeholder="متن"
@@ -592,7 +603,7 @@ function ShortCreateInteractionsStep({
       )}
     </div>
   );
-}
+};
 
 export { ShortCreateInteractionsStep };
 export default ShortCreateInteractionsStep;

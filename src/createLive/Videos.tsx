@@ -23,15 +23,25 @@ interface Props {
   setIsInteractionStep: any;
 }
 
-function Capture({ onSelect, showToast, medias, setIsInteractionStep }: Props) {
+const Capture: React.FC<Props> = ({
+  onSelect,
+  showToast,
+  medias,
+  setIsInteractionStep,
+}: Props): React.ReactElement => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const recordButtonRef = useRef<ComponentRef<typeof RecordButton>>(null);
   const [captureType, setCaptureType] = useState<FileType>(ImageType);
+  useEffect(() => {
+    console.log("ASDFASDFASDF");
+  }, []);
 
   const [videoDevices, setVideoDevices] = useState<InputDeviceInfo[]>([]);
   const [videoDeviceIndex, setVideoDeviceIndex] = useState<number>(0);
+  console.log("KKKKKKKKKKKKKKKKKK");
 
   useEffect(() => {
+    console.log("kir");
     getDevices()
       .then((videoDevices) => {
         console.log(videoDevices);
@@ -418,6 +428,6 @@ function Capture({ onSelect, showToast, medias, setIsInteractionStep }: Props) {
       </div>
     </div>
   );
-}
+};
 
 export default Capture;

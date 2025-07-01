@@ -30,3 +30,15 @@ export interface Media {
   data: Video | Image;
   interactions: InteractionItem[];
 }
+
+export interface InteractionItemResult {
+  interaction: string;
+  payload: any;
+  geometric: RelativeGeometric;
+}
+
+export interface MediaResult {
+  fileType: FileType;
+  data: Video | Image;
+  interactions: InteractionItemResult[];
+}
