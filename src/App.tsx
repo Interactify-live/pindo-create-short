@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import type { JSX } from "react";
 import ShortCreateInteractionsStep from "./interactions";
 import {
   FileType,
@@ -17,7 +16,13 @@ declare global {
   }
 }
 
-function App(props: { onFinish: (medias: MediaResult[]) => void }) {
+function App(props: {
+  onFinish: (medias: MediaResult[]) => void;
+  uploadFile?: (
+    file: File,
+    onProgress: (progress: number) => void
+  ) => Promise<string>;
+}) {
   const [medias, setMedias] = useState<Media[]>([]);
   const [coverIndex, setCoverIndex] = useState(0);
   const [isInteractionStep, setIsInteractionStep] = useState(false);
@@ -90,6 +95,7 @@ function App(props: { onFinish: (medias: MediaResult[]) => void }) {
           coverIndex={coverIndex}
           setCoverIndex={setCoverIndex}
           onFinish={props.onFinish}
+          uploadFile={props.uploadFile}
         />
       )}
       {toastMessage && (

@@ -1,6 +1,6 @@
 {
   "name": "@livuvo/short-sdk-wizard",
-  "version": "0.8.14",
+  "version": "0.8.15",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",

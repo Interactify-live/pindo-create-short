@@ -23,6 +23,10 @@ interface Props {
   coverIndex: number;
   setCoverIndex: React.Dispatch<React.SetStateAction<number>>;
   onFinish: (medias: MediaResult[]) => void;
+  uploadFile?: (
+    file: File,
+    onProgress: (progress: number) => void
+  ) => Promise<string>;
 }
 
 const ShortCreateInteractionsStep: React.FC<Props> = ({
@@ -32,6 +36,7 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
   coverIndex,
   setCoverIndex,
   onFinish,
+  uploadFile,
 }: Props) => {
   const [activeInteraction, setActiveInteraction] = useState(-1);
   const hasAnyActiveInteraction = activeInteraction !== -1;
@@ -41,6 +46,30 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
   const [activeMedia, setActiveMedia] = useState(
     medias.length > 0 ? medias.length - 1 : 0
   );
+  const [uploadProgressValue, setUploadProgressValue] = useState<number>(0);
+
+  // Initialize upload progress for the latest media item
+  useEffect(() => {
+    console.log("KOS", medias.length, uploadFile);
+    if (uploadFile && medias.length > 0) {
+      const latestMedia = medias[medias.length - 1];
+      const onProgress = (progress: number) => {
+        console.log("KOOOOOOOOOOOOOOOON", progress, 100 - progress);
+        // Convert percentage (0-100) to decimal (0-1) for calculations
+        setUploadProgressValue(progress / 100);
+      };
+
+      // Start upload for the latest media
+      uploadFile(latestMedia.data.file, onProgress)
+        .then((uploadedUrl) => {
+          console.log("Upload completed:", uploadedUrl);
+          // You can store the uploaded URL if needed
+        })
+        .catch((error) => {
+          console.error("Upload failed:", error);
+        });
+    }
+  }, [medias.length, uploadFile, medias]);
 
   useEffect(() => {
     console.log("KIR", medias[activeMedia]);
@@ -339,7 +368,7 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
                               return {
                                 payload: interactionItem.payload,
                                 geometric: interactionItem.geometric,
-                                interaction: interactionItem.interaction.type, // Extract just the type string
+                                interaction: interactionItem.interaction.type,
                               };
                             }
                           ),
@@ -428,6 +457,10 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
           }}
         >
           {medias.map((media, idx) => {
+            // Only apply progress animation to the last media item (the one being uploaded)
+            const isLastItem = idx === medias.length - 1;
+            const showProgress = uploadFile && isLastItem;
+
             if (medias && medias[idx] && media.fileType === VideoType) {
               const video = media.data as Video;
               return (
@@ -441,7 +474,7 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
                   key={idx}
                 >
                   {video.thumbnail ? (
-                    <div>
+                    <div style={{ position: "relative" }}>
                       <img
                         src={video.thumbnail}
                         alt="video thumbnail"
@@ -456,6 +489,20 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
                           setActiveInteraction(-1);
                         }}
                       />
+                      {showProgress && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            height: `${(1 - uploadProgressValue) * 100}%`,
+                            background: "rgba(0, 0, 0, 0.6)",
+                            borderRadius: "0 0 4px 4px",
+                            transition: "height 0.3s ease",
+                          }}
+                        />
+                      )}
                     </div>
                   ) : (
                     <div
@@ -464,12 +511,28 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
                         height: "42px",
                         background: "#ccc",
                         borderRadius: "4px",
+                        position: "relative",
                       }}
                       onClick={() => {
                         setActiveMedia(idx);
                         setActiveInteraction(-1);
                       }}
-                    ></div>
+                    >
+                      {showProgress && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            height: `${(1 - uploadProgressValue) * 100}%`,
+                            background: "rgba(0, 0, 0, 0.6)",
+                            borderRadius: "0 0 4px 4px",
+                            transition: "height 0.3s ease",
+                          }}
+                        />
+                      )}
+                    </div>
                   )}
                 </div>
               );
@@ -486,23 +549,39 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
                 }}
                 key={idx}
               >
-                <img
-                  onClick={() => {
-                    setActiveMedia(idx);
-                    setActiveInteraction(-1);
-                  }}
-                  src={image.src}
-                  alt="image"
-                  style={{
-                    width: "42px",
-                    height: "42px",
-                    objectFit: "cover",
-                    boxSizing: "border-box",
-                    border: idx === activeMedia ? "4px solid green" : "none",
-                    borderRadius: idx === activeMedia ? "none" : "4px",
-                    display: "block",
-                  }}
-                />
+                <div style={{ position: "relative" }}>
+                  <img
+                    onClick={() => {
+                      setActiveMedia(idx);
+                      setActiveInteraction(-1);
+                    }}
+                    src={image.src}
+                    alt="image"
+                    style={{
+                      width: "42px",
+                      height: "42px",
+                      objectFit: "cover",
+                      boxSizing: "border-box",
+                      border: idx === activeMedia ? "4px solid green" : "none",
+                      borderRadius: idx === activeMedia ? "none" : "4px",
+                      display: "block",
+                    }}
+                  />
+                  {showProgress && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: `${(1 - uploadProgressValue) * 100}%`,
+                        background: "rgba(0, 0, 0, 0.6)",
+                        borderRadius: "0 0 4px 4px",
+                        transition: "height 0.3s ease",
+                      }}
+                    />
+                  )}
+                </div>
               </div>
             );
           })}
