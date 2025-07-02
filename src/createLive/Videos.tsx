@@ -45,7 +45,7 @@ const Capture: React.FC<Props> = ({
     getDevices()
       .then((videoDevices) => {
         console.log(videoDevices);
-        setVideoDevices(videoDevices);
+        setVideoDevices(videoDevices as InputDeviceInfo[]);
       })
       .catch((e) => console.error("enumerateDevices", e));
   }, []);
@@ -160,156 +160,147 @@ const Capture: React.FC<Props> = ({
         display: "flex",
         flexDirection: "column",
         height: "100dvh",
-        background: "black",
+        background: "rgba(38, 38, 38, 1)",
         width: "100vw",
         overflow: "hidden",
       }}
     >
-      {/* Top header */}
-      <div style={{ position: "absolute", top: 0, width: "100%", zIndex: 10 }}>
+      <div>
         <div
           style={{
+            width: "100%",
+            color: "white",
             display: "flex",
             alignItems: "center",
-            padding: "22px 16px 0",
+            height: "100px",
+            position: "relative",
           }}
         >
-          <div>
-            <FlashButton />
-          </div>
+          {/* SVG on the left */}
           <div
             style={{
-              flex: 1,
-              textAlign: "center",
-              justifyContent: "center",
+              position: "absolute",
+              left: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
               display: "flex",
+              alignItems: "center",
+              paddingLeft: "16px",
             }}
           >
-            <div
-              style={{
-                background: "rgba(255, 255, 255, 0.3)",
-                display: "block",
-                width: "100px",
-                padding: "5px",
-                borderRadius: "15px",
-              }}
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ transform: "scaleX(-1)" }}
             >
-              انتشار آگهی
-            </div>
+              <rect
+                x="0.5"
+                y="0.5"
+                width="39"
+                height="39"
+                rx="19.5"
+                stroke="rgba(141, 143, 144, 1)"
+              />
+              <path
+                d="M18.5 11C16.567 11 15 12.567 15 14.5V16H17V14.5C17 13.6716 17.6716 13 18.5 13H22.5C23.3284 13 24 13.6716 24 14.5V16.5388C24 16.8425 23.8619 17.1298 23.6247 17.3196L19.7506 20.4189C19.2762 20.7984 19 21.3731 19 21.9806V25H21V21.9806L24.8741 18.8814C25.5857 18.312 26 17.4501 26 16.5388V14.5C26 12.567 24.433 11 22.5 11H18.5Z"
+                fill="rgba(141, 143, 144, 1)"
+              />
+              <path d="M21 27H19V29H21V27Z" fill="rgba(141, 143, 144, 1)" />
+            </svg>
           </div>
-          <div>
-            <CloseButton />
+
+          {/* Centered buttons */}
+          <div
+            style={{
+              margin: "0 auto",
+              display: "flex",
+              gap: "12px",
+              padding: "8px",
+              border: "1px solid rgba(141, 143, 144, 1)",
+              borderRadius: "8px",
+              background: "transparent",
+            }}
+          >
+            <button
+              style={{
+                background: captureType === VideoType ? "white" : "transparent",
+                fontSize: "14px",
+                borderRadius: "32px",
+                padding: "2px 13px",
+                border: "none",
+                fontWeight: "bold",
+                color: captureType === VideoType ? "black" : "white",
+                width: "60px",
+                height: "40px",
+              }}
+              onClick={() => setCaptureType(VideoType)}
+            >
+              ویدئو
+            </button>
+            <button
+              style={{
+                background: captureType === ImageType ? "white" : "transparent",
+                fontSize: "14px",
+                borderRadius: "32px",
+                padding: "2px 13px",
+                border: "none",
+                fontWeight: "bold",
+                color: captureType === ImageType ? "black" : "white",
+                width: "60px",
+                height: "40px",
+              }}
+              onClick={() => setCaptureType(ImageType)}
+            >
+              عکس
+            </button>
           </div>
         </div>
       </div>
-
-      {/* Main camera preview */}
-      <div
-        style={{
-          flexGrow: 1,
-          backgroundColor: "black",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          position: "relative",
-          height: "calc(100dvh - 105px)", // bottom bar height
-        }}
-      >
-        <video
-          playsInline
-          muted
-          autoPlay
-          ref={videoRef}
-          style={{
-            display: "block",
-            width: "100vw",
-            height: "calc(100dvh - 105px)", // bottom bar height
-            margin: "0 auto",
-            backgroundColor: "black",
-            // maxHeight: "100dvh",
-          }}
-        />
-
-        {/* Capture mode switch */}
+      <div style={{ background: "rgba(38, 38, 38, 1)", height: "100%" }}>
         <div
           style={{
-            position: "absolute",
-            width: "100%",
-            bottom: "0",
-            color: "white",
-            background: "rgba(0, 0, 0, 0.4)",
-            height: "120px",
+            flexGrow: 1,
+            margin: "10px",
+            backgroundColor: "black",
             display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "relative",
+            height: "calc(100% - 50px)",
           }}
         >
           <div
-            style={{
-              width: "100%",
-              marginTop: "auto",
-              marginBottom: "24px",
-              display: "flex",
-              justifyContent: "center", // Center the main content
-              alignItems: "center",
-              position: "relative", // Needed for absolute positioning of the last button
-            }}
+            style={{ position: "absolute", top: 0, width: "100%", zIndex: 10 }}
           >
-            {/* Center group for the two buttons */}
-            <div style={{ display: "flex", gap: "5px" }}>
-              <button
-                style={{
-                  background:
-                    captureType === VideoType
-                      ? "white"
-                      : "rgba(255,255,255,0.3)",
-                  fontSize: "14px",
-                  borderRadius: "14px",
-                  padding: "5px 12px",
-                  border: "none",
-                  fontWeight: "bold",
-                  color: "black",
-                }}
-                onClick={() => setCaptureType(VideoType)}
-              >
-                ویدئو
-              </button>
-              <button
-                style={{
-                  background:
-                    captureType === ImageType
-                      ? "white"
-                      : "rgba(255,255,255,0.3)",
-                  fontSize: "14px",
-                  borderRadius: "14px",
-                  padding: "5px 12px",
-                  border: "none",
-                  fontWeight: "bold",
-                  color: "black",
-                }}
-                onClick={() => setCaptureType(ImageType)}
-              >
-                عکس
-              </button>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "22px 16px 0",
+              }}
+            >
+              <div>
+                <FlashButton />
+              </div>
             </div>
-
-            {/* Continue button positioned absolutely on the right */}
-            {medias.length > 0 && (
-              <button
-                style={{
-                  background: "rgba(37, 79, 195, 1)",
-                  color: "white",
-                  border: "none",
-                  width: "100px",
-                  height: "40px",
-                  borderRadius: "5px",
-                  position: "absolute",
-                  right: "20px", // Position on the right edge
-                }}
-                onClick={() => setIsInteractionStep(true)}
-              >
-                بازگشت
-              </button>
-            )}
           </div>
+          <video
+            playsInline
+            muted
+            autoPlay
+            ref={videoRef}
+            style={{
+              display: "block",
+              width: "100%",
+              // height: "calc(100dvh - 105px)", // bottom bar height
+              margin: "0 auto",
+              backgroundColor: "black",
+              // maxHeight: "100dvh",
+            }}
+          />
         </div>
       </div>
 
@@ -431,3 +422,85 @@ const Capture: React.FC<Props> = ({
 };
 
 export default Capture;
+
+// {/* Capture mode switch */}
+// <div
+//   style={{
+//     position: "absolute",
+//     width: "100%",
+//     bottom: "0",
+//     color: "white",
+//     background: "rgba(0, 0, 0, 0.4)",
+//     height: "120px",
+//     display: "flex",
+//   }}
+// >
+//   <div
+//     style={{
+//       width: "100%",
+//       marginTop: "auto",
+//       marginBottom: "24px",
+//       display: "flex",
+//       justifyContent: "center", // Center the main content
+//       alignItems: "center",
+//       position: "relative", // Needed for absolute positioning of the last button
+//     }}
+//   >
+//     {/* Center group for the two buttons */}
+//     <div style={{ display: "flex", gap: "5px" }}>
+//       <button
+//         style={{
+//           background:
+//             captureType === VideoType
+//               ? "white"
+//               : "rgba(255,255,255,0.3)",
+//           fontSize: "14px",
+//           borderRadius: "14px",
+//           padding: "5px 12px",
+//           border: "none",
+//           fontWeight: "bold",
+//           color: "black",
+//         }}
+//         onClick={() => setCaptureType(VideoType)}
+//       >
+//         ویدئو
+//       </button>
+//       <button
+//         style={{
+//           background:
+//             captureType === ImageType
+//               ? "white"
+//               : "rgba(255,255,255,0.3)",
+//           fontSize: "14px",
+//           borderRadius: "14px",
+//           padding: "5px 12px",
+//           border: "none",
+//           fontWeight: "bold",
+//           color: "black",
+//         }}
+//         onClick={() => setCaptureType(ImageType)}
+//       >
+//         عکس
+//       </button>
+//     </div>
+
+//     {/* Continue button positioned absolutely on the right */}
+//     {medias.length > 0 && (
+//       <button
+//         style={{
+//           background: "rgba(37, 79, 195, 1)",
+//           color: "white",
+//           border: "none",
+//           width: "100px",
+//           height: "40px",
+//           borderRadius: "5px",
+//           position: "absolute",
+//           right: "20px", // Position on the right edge
+//         }}
+//         onClick={() => setIsInteractionStep(true)}
+//       >
+//         بازگشت
+//       </button>
+//     )}
+//   </div>
+// </div>
