@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import type { JSX } from "react";
 import ShortCreateInteractionsStep from "./interactions";
 import {
   FileType,
@@ -45,7 +46,7 @@ function App(props: { onFinish: (medias: MediaResult[]) => void }) {
               if (!thumb) return;
               const duration = await getMediaDuration(f);
 
-              setMedias((prevMedias) => {
+              setMedias((prevMedias: Media[]) => {
                 return [
                   ...prevMedias,
                   {
@@ -63,7 +64,7 @@ function App(props: { onFinish: (medias: MediaResult[]) => void }) {
                 ];
               });
             } else {
-              setMedias((prevMedias) => {
+              setMedias((prevMedias: Media[]) => {
                 return [
                   ...prevMedias,
                   {
