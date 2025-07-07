@@ -160,7 +160,6 @@ const Capture: React.FC<Props> = ({
         display: "flex",
         flexDirection: "column",
         height: "100dvh",
-        background: "rgba(38, 38, 38, 1)",
         width: "100vw",
         overflow: "hidden",
       }}

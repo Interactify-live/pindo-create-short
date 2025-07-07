@@ -64,8 +64,9 @@ function VideoPlayer({
     <div
       style={{
         width: "100%",
-        height: "calc(100dvh - 105px)",
+        height: "100%",
         overflow: "hidden",
+        borderRadius: "8px",
       }}
     >
       <Draggable.Container>

@@ -36,7 +36,7 @@ function App(props: {
   };
 
   return (
-    <div style={{ height: "100%" }}>
+    <div style={{ height: "100%", background: "#262626" }}>
       {!isInteractionStep ? (
         <Capture
           medias={medias}
