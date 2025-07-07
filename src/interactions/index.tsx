@@ -45,23 +45,38 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
     console.log("KOS", medias.length, uploadFile);
     if (uploadFile && medias.length > 0) {
       const latestMedia = medias[medias.length - 1];
-      const onProgress = (progress: number) => {
-        console.log("KOOOOOOOOOOOOOOOON", progress, 100 - progress);
-        // Convert percentage (0-100) to decimal (0-1) for calculations
-        setUploadProgressValue(progress / 100);
-      };
 
-      // Start upload for the latest media
-      uploadFile(latestMedia.data.file, onProgress)
-        .then((uploadedUrl) => {
-          console.log("Upload completed:", uploadedUrl);
-          // You can store the uploaded URL if needed
-        })
-        .catch((error) => {
-          console.error("Upload failed:", error);
-        });
+      // Only upload if the media hasn't been uploaded yet
+      if (!latestMedia.isUploaded) {
+        const onProgress = (progress: number) => {
+          console.log("KOOOOOOOOOOOOOOOON", progress, 100 - progress);
+          // Convert percentage (0-100) to decimal (0-1) for calculations
+          setUploadProgressValue(progress / 100);
+        };
+
+        // Start upload for the latest media
+        uploadFile(latestMedia.data.file, onProgress)
+          .then((uploadedUrl) => {
+            console.log("Upload completed:", uploadedUrl);
+            // Mark the media as uploaded
+            setMedias((prevMedias) => {
+              return prevMedias.map((media, index) => {
+                if (index === medias.length - 1) {
+                  return {
+                    ...media,
+                    isUploaded: true,
+                  };
+                }
+                return media;
+              });
+            });
+          })
+          .catch((error) => {
+            console.error("Upload failed:", error);
+          });
+      }
     }
-  }, [medias.length, uploadFile, medias]);
+  }, [medias.length, uploadFile]);
 
   useEffect(() => {
     console.log("KIR", medias[activeMedia]);
