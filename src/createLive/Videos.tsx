@@ -175,11 +175,10 @@ const Capture: React.FC<Props> = ({
             position: "relative",
           }}
         >
-          {/* SVG on the right (RTL) */}
           <div
             style={{
               position: "absolute",
-              right: 0,
+              left: "15px",
               top: "50%",
               transform: "translateY(-50%)",
               display: "flex",
@@ -225,22 +224,6 @@ const Capture: React.FC<Props> = ({
           >
             <button
               style={{
-                background: captureType === VideoType ? "white" : "transparent",
-                fontSize: "14px",
-                borderRadius: "32px",
-                padding: "2px 13px",
-                border: "none",
-                fontWeight: "bold",
-                color: captureType === VideoType ? "black" : "white",
-                width: "60px",
-                height: "40px",
-              }}
-              onClick={() => setCaptureType(VideoType)}
-            >
-              ویدئو
-            </button>
-            <button
-              style={{
                 background: captureType === ImageType ? "white" : "transparent",
                 fontSize: "14px",
                 borderRadius: "32px",
@@ -254,6 +237,22 @@ const Capture: React.FC<Props> = ({
               onClick={() => setCaptureType(ImageType)}
             >
               عکس
+            </button>
+            <button
+              style={{
+                background: captureType === VideoType ? "white" : "transparent",
+                fontSize: "14px",
+                borderRadius: "32px",
+                padding: "2px 13px",
+                border: "none",
+                fontWeight: "bold",
+                color: captureType === VideoType ? "black" : "white",
+                width: "60px",
+                height: "40px",
+              }}
+              onClick={() => setCaptureType(VideoType)}
+            >
+              ویدئو
             </button>
           </div>
         </div>
@@ -278,6 +277,7 @@ const Capture: React.FC<Props> = ({
               style={{
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "flex-end",
                 padding: "22px 16px 0",
               }}
             >
@@ -316,62 +316,12 @@ const Capture: React.FC<Props> = ({
           flexShrink: 0,
         }}
       >
-        {/* Right: Gallery (RTL) */}
         <div
           style={{
             display: "flex",
             width: "100px",
             marginRight: "30px",
             justifyContent: "flex-end",
-          }}
-        >
-          <BrowseFileButton
-            medias={medias}
-            disabled={isRecording}
-            showToast={showToast}
-            onSelect={async (files: File[]) => {
-              for (const file of files) {
-                const type = file.type;
-                const isVideo = type.startsWith("video/");
-                const isImage = type.startsWith("image/");
-
-                if (isVideo) {
-                  const thumb = await generateThumbnailFromFile(file);
-                  onSelect(file, VideoType, thumb); // this is your own handler
-                } else if (isImage) {
-                  onSelect(file, ImageType, null);
-                } else {
-                  console.warn("Unsupported file type:", type);
-                }
-              }
-            }}
-          />
-        </div>
-
-        {/* Center: Record Button */}
-        <div style={{ display: "flex", justifyContent: "center", flex: 1 }}>
-          {mediaStream && (
-            <RecordButton
-              captureType={captureType}
-              ref={recordButtonRef}
-              onClick={() => {
-                if (captureType === VideoType) {
-                  isRecording ? stop() : record(mediaStream);
-                } else {
-                  takePhoto();
-                }
-              }}
-            />
-          )}
-        </div>
-
-        {/* Left: Switch Camera (RTL) */}
-        <div
-          style={{
-            display: "flex",
-            width: "100px",
-            marginLeft: "30px",
-            justifyContent: "flex-start",
           }}
         >
           {videoDevices.length > 1 && (
@@ -415,6 +365,54 @@ const Capture: React.FC<Props> = ({
             </button>
           )}
         </div>
+
+        {/* Center: Record Button */}
+        <div style={{ display: "flex", justifyContent: "center", flex: 1 }}>
+          {mediaStream && (
+            <RecordButton
+              captureType={captureType}
+              ref={recordButtonRef}
+              onClick={() => {
+                if (captureType === VideoType) {
+                  isRecording ? stop() : record(mediaStream);
+                } else {
+                  takePhoto();
+                }
+              }}
+            />
+          )}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            width: "100px",
+            marginLeft: "30px",
+            justifyContent: "flex-end",
+          }}
+        >
+          <BrowseFileButton
+            medias={medias}
+            disabled={isRecording}
+            showToast={showToast}
+            onSelect={async (files: File[]) => {
+              for (const file of files) {
+                const type = file.type;
+                const isVideo = type.startsWith("video/");
+                const isImage = type.startsWith("image/");
+
+                if (isVideo) {
+                  const thumb = await generateThumbnailFromFile(file);
+                  onSelect(file, VideoType, thumb); // this is your own handler
+                } else if (isImage) {
+                  onSelect(file, ImageType, null);
+                } else {
+                  console.warn("Unsupported file type:", type);
+                }
+              }
+            }}
+          />
+        </div>
+
       </div>
     </div>
   );
