@@ -1,3 +1,4 @@
+import React from "react";
 import { CSSProperties, useState } from "react";
 import { Interaction } from "../Interactions";
 import { InteractionsList } from "./InteractionsList";

@@ -1,7 +1,5 @@
 import React from "react";
-import classnames from "classnames";
 import { INTERACTIONS, Interaction } from "../../Interactions";
-import styles from "./styles.module.scss";
 
 interface Props {
   onClickInteraction: (interaction: Interaction) => void;
@@ -37,7 +35,7 @@ function InteractionsList({ onClickInteraction, className }: Props) {
               alignItems: "center",
               justifyContent: "center",
               display: "flex",
-              background: "rgba(0, 18, 18, 0.2)",
+              background: "transparent",
               borderRadius: "50%",
             }}
           >
