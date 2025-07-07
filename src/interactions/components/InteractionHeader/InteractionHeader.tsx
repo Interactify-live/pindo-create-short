@@ -58,6 +58,7 @@ const InteractionHeader: React.FC<InteractionHeaderProps> = ({
         alignItems: "center",
         zIndex: 999,
         width: "100%",
+        direction: "rtl",
       }}
     >
       <div
@@ -104,8 +105,8 @@ const InteractionHeader: React.FC<InteractionHeaderProps> = ({
               fontWeight: "bold",
               fontSize: "14px",
               cursor: "pointer",
-              marginRight: "25px",
-              marginLeft: "auto",
+              marginLeft: "25px",
+              marginRight: "auto",
             }}
             onClick={onSaveActiveInteraction}
           >

@@ -175,16 +175,16 @@ const Capture: React.FC<Props> = ({
             position: "relative",
           }}
         >
-          {/* SVG on the left */}
+          {/* SVG on the right (RTL) */}
           <div
             style={{
               position: "absolute",
-              left: 0,
+              right: 0,
               top: "50%",
               transform: "translateY(-50%)",
               display: "flex",
               alignItems: "center",
-              paddingLeft: "16px",
+              paddingRight: "16px",
             }}
           >
             <svg
@@ -316,13 +316,13 @@ const Capture: React.FC<Props> = ({
           flexShrink: 0,
         }}
       >
-        {/* Left: Gallery */}
+        {/* Right: Gallery (RTL) */}
         <div
           style={{
             display: "flex",
             width: "100px",
-            marginLeft: "30px",
-            justifyContent: "flex-start",
+            marginRight: "30px",
+            justifyContent: "flex-end",
           }}
         >
           <BrowseFileButton
@@ -365,13 +365,13 @@ const Capture: React.FC<Props> = ({
           )}
         </div>
 
-        {/* Right: Switch Camera */}
+        {/* Left: Switch Camera (RTL) */}
         <div
           style={{
             display: "flex",
             width: "100px",
-            marginRight: "30px",
-            justifyContent: "flex-end",
+            marginLeft: "30px",
+            justifyContent: "flex-start",
           }}
         >
           {videoDevices.length > 1 && (
