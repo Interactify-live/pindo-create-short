@@ -1,4 +1,3 @@
-import React from "react";
 interface Geometric {
   x: number;
   y: number;

@@ -1,4 +1,3 @@
-import React from "react";
 const VIDEO_INDEX_COLORS = [
   "var(--color-primary-40)",
   "var(--color-secondary-40)",

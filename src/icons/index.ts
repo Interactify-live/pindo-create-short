@@ -1,0 +1,12 @@
+export { default as Play } from './play';
+export { default as Pause } from './pause';
+export { default as Trash } from './trash';
+export { default as Flash } from './Flash';
+export { default as Close } from './Close';
+export { default as Text } from './Text';
+export { default as Gallery } from './Gallery';
+export { default as Camera } from './Camera';
+export { default as Rotate } from './Rotate';
+export { default as Check } from './Check';
+export { default as Add } from './Add';
+export { default as Warning } from './Warning';

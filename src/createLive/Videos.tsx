@@ -15,6 +15,7 @@ import { getConstraints, getDevices } from "../utils/camera";
 import { VIDEO_MAX_DURATION } from "../shared/constants";
 import { generateThumbnailFromFile } from "../utils/thumbnail";
 import { getMediaDuration } from "../shared/utils";
+import { Camera, Rotate } from "../icons";
 
 interface Props {
   onSelect: (file: File, mediaType: FileType, thumb: any | null) => void;
@@ -186,28 +187,7 @@ const Capture: React.FC<Props> = ({
               paddingRight: "16px",
             }}
           >
-            <svg
-              width="40"
-              height="40"
-              viewBox="0 0 40 40"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ transform: "scaleX(-1)" }}
-            >
-              <rect
-                x="0.5"
-                y="0.5"
-                width="39"
-                height="39"
-                rx="19.5"
-                stroke="rgba(141, 143, 144, 1)"
-              />
-              <path
-                d="M18.5 11C16.567 11 15 12.567 15 14.5V16H17V14.5C17 13.6716 17.6716 13 18.5 13H22.5C23.3284 13 24 13.6716 24 14.5V16.5388C24 16.8425 23.8619 17.1298 23.6247 17.3196L19.7506 20.4189C19.2762 20.7984 19 21.3731 19 21.9806V25H21V21.9806L24.8741 18.8814C25.5857 18.312 26 17.4501 26 16.5388V14.5C26 12.567 24.433 11 22.5 11H18.5Z"
-                fill="rgba(141, 143, 144, 1)"
-              />
-              <path d="M21 27H19V29H21V27Z" fill="rgba(141, 143, 144, 1)" />
-            </svg>
+            <Camera />
           </div>
 
           {/* Centered buttons */}
@@ -345,21 +325,7 @@ const Capture: React.FC<Props> = ({
                   justifyContent: "center",
                 }}
               >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 25"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M22 12.5C22 18.02 17.52 22.5 12 22.5C6.48 22.5 3.11 16.94 3.11 16.94M3.11 16.94H7.63M3.11 16.94V21.94M2 12.5C2 6.98 6.44 2.5 12 2.5C18.67 2.5 22 8.06 22 8.06M22 8.06V3.06M22 8.06H17.56"
-                    stroke="white"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Rotate />
                 <span style={{ color: "white", fontSize: "10px" }}>بچرخ</span>
               </div>
             </button>

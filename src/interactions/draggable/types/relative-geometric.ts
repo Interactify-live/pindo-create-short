@@ -1,4 +1,3 @@
-import React from "react";
 import { Geometric } from "./geometric";
 
 interface RelativeGeometric extends Geometric {

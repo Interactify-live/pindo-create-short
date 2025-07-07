@@ -1,4 +1,3 @@
-import React from "react";
 import { INTERACTIONS, Interaction } from "../../Interactions";
 
 interface Props {

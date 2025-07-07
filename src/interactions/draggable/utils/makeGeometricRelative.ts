@@ -1,4 +1,3 @@
-import React from "react";
 import { INTERACTIONS_CONTAINER_BASE_WIDTH } from "../../../shared/constants";
 import { Geometric } from "../types/geometric";
 import { RelativeGeometric } from "../types/relative-geometric";

@@ -1,4 +1,3 @@
-import React from "react";
 export default function Play() {
   return (
     <svg width="48px" height="48px" viewBox="0 0 24 24" fill="none">

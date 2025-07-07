@@ -1,4 +1,3 @@
-import React from "react";
 import { VideoPlayer } from "../VideoPlayer";
 import CoverSelector from "../CoverSelector";
 import { Media } from "../../types.d/types";

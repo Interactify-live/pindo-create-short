@@ -1,4 +1,3 @@
-import React from "react";
 interface ReturnType {
   r: number;
   g: number;

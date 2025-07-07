@@ -1,10 +1,14 @@
-import React from "react";
 import MediaThumbnails from "../MediaThumbnails";
-import { Media, ImageType, MediaResult, InteractionItemResult } from "../../types.d/types";
+import {
+  Media,
+  ImageType,
+  MediaResult,
+  InteractionItemResult,
+} from "../../types.d/types";
 
 // Utility function to convert numbers to Persian numerals
 const toPersianNumbers = (num: number): string => {
-  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
   return num.toString().replace(/\d/g, (d) => persianDigits[parseInt(d)]);
 };
 
@@ -54,10 +58,12 @@ const BottomControls: React.FC<BottomControlsProps> = ({
   };
 
   return (
-    <div style={{
-          width: "100%",
-          // height: "90px",
-    }}>
+    <div
+      style={{
+        width: "100%",
+        // height: "90px",
+      }}
+    >
       <div
         style={{
           width: "100%",
@@ -83,24 +89,27 @@ const BottomControls: React.FC<BottomControlsProps> = ({
           coverIndex={coverIndex}
         />
       </div>
-        <div>
-          <div style={{ color: "white", display: "flex", marginBottom: "15px" }}>
-            <div
-              style={{
-                marginLeft: "auto",
-                marginRight: "auto",
-                marginTop: "5px",
-                border: "1.5px solid rgba(255, 255, 255, 1)",
-                borderRadius: "8px",
-                width: "63px",
-                textAlign: "center",
-                fontSize: "10px",
-              }}
-            >
-              {toPersianNumbers(medias.filter((m) => m.fileType === ImageType).length)} / {toPersianNumbers(10)}
-            </div>
+      <div>
+        <div style={{ color: "white", display: "flex", marginBottom: "15px" }}>
+          <div
+            style={{
+              marginLeft: "auto",
+              marginRight: "auto",
+              marginTop: "5px",
+              border: "1.5px solid rgba(255, 255, 255, 1)",
+              borderRadius: "8px",
+              width: "63px",
+              textAlign: "center",
+              fontSize: "10px",
+            }}
+          >
+            {toPersianNumbers(
+              medias.filter((m) => m.fileType === ImageType).length
+            )}{" "}
+            / {toPersianNumbers(10)}
           </div>
         </div>
+      </div>
       <div
         style={{
           background: "black",
