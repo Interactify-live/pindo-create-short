@@ -1,46 +1,141 @@
-# Getting Started with Create React App
+# @livuvo/short-sdk-wizard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React component library for creating interactive short-form videos with text overlays and media management.
 
-## Available Scripts
+## Installation
 
-In the project directory, you can run:
+```bash
+npm install @livuvo/short-sdk-wizard
+```
 
-### `npm start`
+## Usage
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```jsx
+import React from "react";
+import { CaputureWizard } from "@livuvo/short-sdk-wizard";
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+function App() {
+  const handleFinish = (medias) => {
+    console.log("Finished with medias:", medias);
+  };
 
-### `npm test`
+  const uploadFile = async (file, onProgress) => {
+    // Implement your file upload logic here
+    // Return the uploaded file URL
+    return "https://example.com/uploaded-file.mp4";
+  };
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  return (
+    <div style={{ height: "100vh" }}>
+      <CaputureWizard onFinish={handleFinish} uploadFile={uploadFile} />
+    </div>
+  );
+}
 
-### `npm run build`
+export default App;
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## TypeScript Support
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+This package includes TypeScript definitions out of the box. No additional installation needed.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```typescript
+import {
+  MediaResult,
+  FileType,
+  Media,
+  VideoType,
+  ImageType,
+} from "@livuvo/short-sdk-wizard";
+```
 
-### `npm run eject`
+## Available Components
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- `CaputureWizard`: Main component for the complete video creation workflow
+- `Capture`: Component for video/image capture and recording
+- `ShortCreateInteractionsStep`: Component for adding interactions to media
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Requirements
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- React 18.2.0 or higher
+- React DOM 18.2.0 or higher
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Browser Support
 
-## Learn More
+This library requires modern browsers with support for:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- MediaDevices API
+- WebRTC
+- ES6+ features
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Development with npm link
+
+If you're using `npm link` for local development, you may encounter webpack compilation errors. To fix this, update your webpack configuration:
+
+```javascript
+// In your webpack config
+module: {
+  rules: [
+    {
+      test: /\.[jt]sx?$/,
+      exclude: [
+        /node_modules/,
+        // Specifically exclude the linked package
+        /pindo/,
+        /@livuvo\/short-sdk-wizard/
+      ],
+      use: 'babel-loader'
+    }
+  ]
+},
+
+resolve: {
+  extensions: ['.tsx', '.ts', '.js', '.jsx'],
+  modules: ['node_modules'],
+  alias: {
+    '@livuvo/short-sdk-wizard': require.resolve('@livuvo/short-sdk-wizard')
+  }
+},
+
+// Ignore declaration files
+ignoreWarnings: [
+  /Module parse failed: Unexpected token/,
+  /Can't resolve/,
+  /The keyword 'interface' is reserved/
+]
+```
+
+## Troubleshooting
+
+### Webpack Compilation Errors
+
+If you encounter webpack compilation errors related to TypeScript declaration files, ensure your webpack configuration properly excludes `node_modules` and the linked package:
+
+```javascript
+// In your webpack config
+module: {
+  rules: [
+    {
+      test: /\.[jt]sx?$/,
+      exclude: /node_modules/, // This is crucial
+      use: "babel-loader",
+    },
+  ];
+}
+```
+
+### Chunk Loading Errors
+
+If you see "Loading chunk X failed" errors, this has been fixed in the latest version. Make sure you're using the latest version of the package.
+
+### TypeScript Declaration Issues
+
+TypeScript definitions are included in the main package. If you encounter any issues, make sure you're using the latest version.
+
+## Package Structure
+
+- `@livuvo/short-sdk-wizard`: Main component library with TypeScript definitions included
+
+## License
+
+MIT

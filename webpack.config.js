@@ -18,7 +18,10 @@ module.exports = [
         export: "named",
       },
       globalObject: "this",
-      clean: true,
+      clean: false, // Don't clean dist as TypeScript will generate declarations
+      // Prevent chunk loading issues
+      chunkLoading: false,
+      wasmLoading: false,
     },
     externals: {
       react: {
@@ -51,6 +54,9 @@ module.exports = [
       environment: {
         module: true,
       },
+      // Prevent chunk loading issues
+      chunkLoading: false,
+      wasmLoading: false,
     },
     experiments: {
       outputModule: true,
@@ -161,6 +167,15 @@ function shared() {
     optimization: {
       minimize: true,
       nodeEnv: "production",
+      // Disable code splitting for library builds
+      splitChunks: false,
+      runtimeChunk: false,
+      // Ensure all modules are bundled together
+      concatenateModules: true,
+    },
+    // Ensure proper module resolution
+    resolveLoader: {
+      modules: ["node_modules"],
     },
   };
 }

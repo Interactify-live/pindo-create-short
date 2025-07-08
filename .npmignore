@@ -1,13 +1,48 @@
-/src
-/public
-*.config.js
-*.conf
-Dockerfile
-*.md
-*.lock
+# Source files
+src/
+*.ts
+*.tsx
+*.js
+*.jsx
+
+# Development files
+node_modules/
+.git/
 .gitignore
-.eslintrc
-.prettierrc
+README.md
+*.log
+*.md
+
+# Build artifacts (except dist)
+build/
+coverage/
+.nyc_output/
+types-dist/
+types/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
 **/*.test.*
-**/__tests__
-**/__mocks__
+**/*.spec.*
+__tests__/
+test/
+
+# Configuration files (except package.json and tsconfig.json)
+webpack.config.js
+babel.config.js
+.eslintrc*
+.prettierrc*
+jest.config.*
+
+# Development scripts
+scripts/
+tools/
