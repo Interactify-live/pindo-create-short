@@ -160,7 +160,7 @@ const Capture: React.FC<Props> = ({
       style={{
         display: "flex",
         flexDirection: "column",
-        height: "100dvh",
+        flexGrow: 1,
         width: "100vw",
         overflow: "hidden",
       }}
@@ -378,7 +378,6 @@ const Capture: React.FC<Props> = ({
             }}
           />
         </div>
-
       </div>
     </div>
   );

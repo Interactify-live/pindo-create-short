@@ -1,6 +1,0 @@
-declare const VIDEO_INDEX_COLORS: string[];
-declare const VIDEO_MAX_DURATION = 70;
-declare const INTERACTIONS_CONTAINER_BASE_WIDTH = 360;
-export { INTERACTIONS_CONTAINER_BASE_WIDTH };
-export { VIDEO_MAX_DURATION };
-export { VIDEO_INDEX_COLORS };

@@ -37,7 +37,16 @@ function App(props: {
   };
 
   return (
-    <div style={{ height: "100%", background: "#262626", direction: "rtl" }}>
+    <div
+      style={{
+        height: "100%",
+        flexGrow: 1,
+        display: "flex",
+        flexDirection: "column",
+        background: "#262626",
+        direction: "rtl",
+      }}
+    >
       {!isInteractionStep ? (
         <Capture
           medias={medias}

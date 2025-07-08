@@ -1,9 +1,0 @@
-html,
-body,
-#root {
-  overscroll-behavior: none;
-  touch-action: none;
-  /* overflow: hidden; */
-  margin: 0;
-  height: 100dvh;
-}
