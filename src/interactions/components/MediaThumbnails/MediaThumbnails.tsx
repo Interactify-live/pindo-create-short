@@ -1,4 +1,4 @@
-import React, { useMemo, memo } from "react";
+import React, { useMemo, memo, useCallback } from "react";
 import { Media, Video, Image, VideoType, ImageType } from "../../types.d/types";
 import { Add, VideoPlay } from "../../../icons";
 
@@ -14,21 +14,18 @@ interface MediaThumbnailsProps {
   setInteractionStep: (value: boolean) => void;
   coverIndex: number;
   setMedias: React.Dispatch<React.SetStateAction<Media[]>>;
-  uploadingFiles: Map<string, number>;
+  uploadProgress: Map<string, number>;
 }
 
-// Progress overlay component with CSS-only animations to prevent flickering
-const ProgressOverlay = ({
-  fileId,
-  uploadingFiles,
-}: {
+// Progress overlay component that shows upload progress
+const ProgressOverlay = memo<{
   fileId: string;
-  uploadingFiles: Map<string, number>;
-}) => {
-  const showProgress = uploadingFiles && uploadingFiles.has(fileId);
-  const progressValue = uploadingFiles?.get(fileId) || 0;
+  uploadProgress: Map<string, number>;
+}>(({ fileId, uploadProgress }) => {
+  const progress = uploadProgress.get(fileId) || 0;
+  const isUploading = uploadProgress.has(fileId) && progress < 1;
 
-  if (!showProgress) return null;
+  if (!isUploading) return null;
 
   return (
     <div
@@ -37,7 +34,7 @@ const ProgressOverlay = ({
         left: 0,
         right: 0,
         bottom: 0,
-        height: `${(1 - progressValue) * 100}%`,
+        height: `${(1 - progress) * 100}%`,
         background: "rgba(0, 0, 0, 0.6)",
         borderRadius: "0 0 4px 4px",
         transition: "height 0.1s ease-out",
@@ -47,7 +44,9 @@ const ProgressOverlay = ({
       }}
     />
   );
-};
+});
+
+ProgressOverlay.displayName = "ProgressOverlay";
 
 // Memoized individual media item component to prevent unnecessary re-renders
 const MediaItem = memo<{
@@ -55,11 +54,19 @@ const MediaItem = memo<{
   idx: number;
   activeMedia: number;
   coverIndex: number;
-  uploadingFiles: Map<string, number>;
+  uploadProgress: Map<string, number>;
   onMediaClick: (idx: number) => void;
-}>(({ media, idx, activeMedia, coverIndex, uploadingFiles, onMediaClick }) => {
+}>(({ media, idx, activeMedia, coverIndex, uploadProgress, onMediaClick }) => {
   // Create a unique ID for this file to check if it's being uploaded
-  const fileId = `${media.data.file.name}-${media.data.file.size}-${media.data.file.lastModified}`;
+  const fileId = useMemo(
+    () =>
+      `${media.data.file.name}-${media.data.file.size}-${media.data.file.lastModified}`,
+    [media.data.file.name, media.data.file.size, media.data.file.lastModified]
+  );
+
+  const handleClick = useCallback(() => {
+    onMediaClick(idx);
+  }, [idx, onMediaClick]);
 
   if (media.fileType === VideoType) {
     const video = media.data as Video;
@@ -85,7 +92,7 @@ const MediaItem = memo<{
                 transform: "translateZ(0)", // Force hardware acceleration
                 backfaceVisibility: "hidden", // Prevent flickering
               }}
-              onClick={() => onMediaClick(idx)}
+              onClick={handleClick}
             />
             {/* Video Play Icon - Centered */}
             <div
@@ -104,7 +111,7 @@ const MediaItem = memo<{
             >
               <VideoPlay width={24} height={24} />
             </div>
-            <ProgressOverlay fileId={fileId} uploadingFiles={uploadingFiles} />
+            <ProgressOverlay fileId={fileId} uploadProgress={uploadProgress} />
           </div>
         ) : (
           <div
@@ -115,7 +122,7 @@ const MediaItem = memo<{
               borderRadius: "4px",
               position: "relative",
             }}
-            onClick={() => onMediaClick(idx)}
+            onClick={handleClick}
           >
             {/* Video Play Icon - Centered */}
             <div
@@ -134,7 +141,7 @@ const MediaItem = memo<{
             >
               <VideoPlay width={24} height={24} />
             </div>
-            <ProgressOverlay fileId={fileId} uploadingFiles={uploadingFiles} />
+            <ProgressOverlay fileId={fileId} uploadProgress={uploadProgress} />
           </div>
         )}
       </div>
@@ -155,7 +162,7 @@ const MediaItem = memo<{
     >
       <div style={{ position: "relative" }}>
         <img
-          onClick={() => onMediaClick(idx)}
+          onClick={handleClick}
           src={image.src}
           alt="image"
           style={{
@@ -188,97 +195,115 @@ const MediaItem = memo<{
             عکس اصلی
           </div>
         )}
-        <ProgressOverlay fileId={fileId} uploadingFiles={uploadingFiles} />
+        <ProgressOverlay fileId={fileId} uploadProgress={uploadProgress} />
       </div>
     </div>
   );
 });
 
-const MediaThumbnails: React.FC<MediaThumbnailsProps> = ({
-  medias,
-  activeMedia,
-  setActiveMedia,
-  setActiveInteraction,
-  uploadFile,
-  setInteractionStep,
-  coverIndex,
-  setMedias,
-  uploadingFiles,
-}) => {
-  const handleMediaClick = (idx: number) => {
-    setActiveMedia(idx);
-    setActiveInteraction(-1);
-  };
+MediaItem.displayName = "MediaItem";
 
-  return (
-    <div
-      style={{
-        display: "flex",
-        gap: "10px",
-        overflow: "auto",
-        minWidth: 0,
-        width: "100%",
-        flexShrink: 0,
-      }}
-    >
-      {medias.map((media, idx) => (
+const MediaThumbnails: React.FC<MediaThumbnailsProps> = memo(
+  ({
+    medias,
+    activeMedia,
+    setActiveMedia,
+    setActiveInteraction,
+    uploadFile,
+    setInteractionStep,
+    coverIndex,
+    setMedias,
+    uploadProgress,
+  }) => {
+    const handleMediaClick = useCallback(
+      (idx: number) => {
+        setActiveMedia(idx);
+        setActiveInteraction(-1);
+      },
+      [setActiveMedia, setActiveInteraction]
+    );
+
+    const handleAddClick = useCallback(() => {
+      setInteractionStep(false);
+    }, [setInteractionStep]);
+
+    // Memoize the media items to prevent unnecessary re-renders
+    const mediaItems = useMemo(() => {
+      return medias.map((media, idx) => (
         <MediaItem
           key={`${media.data.file.name}-${media.data.file.size}-${media.data.file.lastModified}`}
           media={media}
           idx={idx}
           activeMedia={activeMedia}
           coverIndex={coverIndex}
-          uploadingFiles={uploadingFiles}
+          uploadProgress={uploadProgress}
           onMediaClick={handleMediaClick}
         />
-      ))}
+      ));
+    }, [medias, activeMedia, coverIndex, uploadProgress, handleMediaClick]);
+
+    return (
       <div
         style={{
-          width: "62px",
-          height: "62px",
-          background: "#ccc",
-          borderRadius: "10px",
-          position: "relative",
+          display: "flex",
+          gap: "10px",
+          overflow: "auto",
+          minWidth: 0,
+          width: "100%",
           flexShrink: 0,
         }}
       >
-        <button
-          onClick={() => setInteractionStep(false)}
+        {mediaItems}
+        <div
           style={{
-            width: "100%",
-            height: "100%",
-            background: "none",
-            color: "white",
-            border: "none",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            width: "62px",
+            height: "62px",
+            background: "#ccc",
+            borderRadius: "10px",
+            position: "relative",
+            flexShrink: 0,
           }}
         >
-          <Add />
-          <div
+          <button
+            onClick={handleAddClick}
             style={{
-              position: "absolute",
-              bottom: "0",
-              height: "18px",
-              background: "rgba(158, 158, 158, 0.7)",
-              fontSize: "10px",
-              textAlign: "center",
-              color: "white",
-              borderRadius: "0 0 10px 10px",
               width: "100%",
+              height: "100%",
+              background: "none",
+              color: "white",
+              border: "none",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            افزودن
-          </div>
-        </button>
+            <Add />
+            <div
+              style={{
+                position: "absolute",
+                bottom: "0",
+                height: "18px",
+                background: "rgba(158, 158, 158, 0.7)",
+                fontSize: "10px",
+                textAlign: "center",
+                color: "white",
+                borderRadius: "0 0 10px 10px",
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              افزودن
+            </div>
+          </button>
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
+
+MediaThumbnails.displayName = "MediaThumbnails";
 
 export default MediaThumbnails;

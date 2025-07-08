@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { makeGeometricRelative } from "./draggable";
 import { Interaction } from "./components/Interactions";
 import InteractionHeader from "./components/InteractionHeader";
@@ -19,187 +19,194 @@ interface Props {
     file: File,
     onProgress: (progress: number) => void
   ) => Promise<string>;
-  uploadingFiles: Map<string, number>;
+  uploadProgress: Map<string, number>;
 }
 
-const ShortCreateInteractionsStep: React.FC<Props> = ({
-  medias,
-  setMedias,
-  setInteractionStep,
-  coverIndex,
-  setCoverIndex,
-  onFinish,
-  uploadFile,
-  uploadingFiles,
-}: Props) => {
-  const [activeInteraction, setActiveInteraction] = useState(-1);
-  const hasAnyActiveInteraction = activeInteraction !== -1;
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [overlayInput, setOverlayInput] = useState("");
-  const [interaction, setInteraction] = useState<any>(null);
-  const [activeMedia, setActiveMedia] = useState(
-    medias.length > 0 ? medias.length - 1 : 0
-  );
+const ShortCreateInteractionsStep: React.FC<Props> = memo(
+  ({
+    medias,
+    setMedias,
+    setInteractionStep,
+    coverIndex,
+    setCoverIndex,
+    onFinish,
+    uploadFile,
+    uploadProgress,
+  }: Props) => {
+    const [activeInteraction, setActiveInteraction] = useState(-1);
+    const hasAnyActiveInteraction = activeInteraction !== -1;
+    const [showOverlay, setShowOverlay] = useState(false);
+    const [overlayInput, setOverlayInput] = useState("");
+    const [interaction, setInteraction] = useState<any>(null);
+    const [activeMedia, setActiveMedia] = useState(
+      medias.length > 0 ? medias.length - 1 : 0
+    );
 
-  useEffect(() => {
-    console.log("KIR", medias[activeMedia]);
-  }, [medias, activeMedia]);
+    useEffect(() => {
+      console.log("KIR", medias[activeMedia]);
+    }, [medias, activeMedia]);
 
-  useEffect(() => {
-    console.log("Updated interactions", medias);
-  }, [medias]);
-  const onAddInteraction = (interaction: Interaction) => {
-    setOverlayInput("");
-    setShowOverlay(true);
-    setInteraction(interaction);
-  };
+    useEffect(() => {
+      console.log("Updated interactions", medias);
+    }, [medias]);
 
-  const handleSaveTextInteraction = (text: string) => {
-    setMedias((prevMedias) => {
-      return prevMedias.map((media, index) => {
-        if (index === activeMedia) {
-          const newInteraction = {
-            interaction,
-            payload: JSON.parse(
-              JSON.stringify({
-                ...interaction.defaultPayload,
-                text: text,
-              })
-            ),
-            geometric: makeGeometricRelative({
-              x: 50,
-              y: 50,
-              width: 100,
-              height: 100,
-            }),
-          };
+    const onAddInteraction = useCallback((interaction: Interaction) => {
+      setOverlayInput("");
+      setShowOverlay(true);
+      setInteraction(interaction);
+    }, []);
 
-          console.log(newInteraction);
+    const handleSaveTextInteraction = useCallback(
+      (text: string) => {
+        setMedias((prevMedias) => {
+          return prevMedias.map((media, index) => {
+            if (index === activeMedia) {
+              const newInteraction = {
+                interaction,
+                payload: JSON.parse(
+                  JSON.stringify({
+                    ...interaction.defaultPayload,
+                    text: text,
+                  })
+                ),
+                geometric: makeGeometricRelative({
+                  x: 50,
+                  y: 50,
+                  width: 100,
+                  height: 100,
+                }),
+              };
 
-          return {
-            ...media,
-            interactions: [...media.interactions, newInteraction],
-          };
-        }
-        return media;
+              console.log(newInteraction);
+
+              return {
+                ...media,
+                interactions: [...media.interactions, newInteraction],
+              };
+            }
+            return media;
+          });
+        });
+
+        setShowOverlay(false);
+        setOverlayInput("");
+      },
+      [activeMedia, interaction, setMedias]
+    );
+
+    const handleCloseTextOverlay = useCallback(() => {
+      setShowOverlay(false);
+      setOverlayInput("");
+    }, []);
+
+    const onDeleteActiveInteraction = useCallback(() => {
+      setMedias((prevMedias) => {
+        return prevMedias.map((media, index) => {
+          if (index === activeMedia) {
+            return {
+              ...media,
+              interactions: media.interactions.filter(
+                (_, i) => i !== activeInteraction
+              ),
+            };
+          }
+          return media;
+        });
       });
-    });
+      setActiveInteraction(-1);
+    }, [activeMedia, activeInteraction, setMedias]);
 
-    setShowOverlay(false);
-    setOverlayInput("");
-  };
+    const onSaveActiveInteraction = useCallback(() => {
+      const { interaction, payload } =
+        medias[activeMedia].interactions[activeInteraction];
+      const errorMessages = (interaction as any).validate({ payload });
 
-  const handleCloseTextOverlay = () => {
-    setShowOverlay(false);
-    setOverlayInput("");
-  };
-
-  const onDeleteActiveInteraction = () => {
-    setMedias((prevMedias) => {
-      return prevMedias.map((media, index) => {
-        if (index === activeMedia) {
-          return {
-            ...media,
-            interactions: media.interactions.filter(
-              (_, i) => i !== activeInteraction
-            ),
-          };
+      for (const errors of Object.values(errorMessages) as string[][]) {
+        for (const error of errors) {
+          if (typeof error !== "string" || error.length <= 0) continue;
+          console.log("ERROR", error);
+          return;
         }
-        return media;
-      });
-    });
-    setActiveInteraction(-1);
-  };
-
-  const onSaveActiveInteraction = () => {
-    const { interaction, payload } =
-      medias[activeMedia].interactions[activeInteraction];
-    const errorMessages = (interaction as any).validate({ payload });
-
-    for (const errors of Object.values(errorMessages) as string[][]) {
-      for (const error of errors) {
-        if (typeof error !== "string" || error.length <= 0) continue;
-        console.log("ERROR", error);
-        return;
       }
-    }
 
-    setActiveInteraction(-1);
-  };
+      setActiveInteraction(-1);
+    }, [medias, activeMedia, activeInteraction]);
 
-  return (
-    <div
-      style={{
-        background: "#262626",
-        flexGrow: 1,
-        width: "100%",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div style={{ padding: "16px", flexGrow: 1 }}>
-        <div
-          style={{
-            border: "2px solid rgba(175, 177, 182, 1)",
-            position: "relative",
-            // width: "100%",
-            // height: "calc(100% - 32px)",
-            // margin: "16px",
-            display: "flex",
-            flexDirection: "column",
-            borderRadius: "8px",
-            // flex: 1,
-          }}
-        >
-          <InteractionHeader
-            activeMedia={activeMedia}
-            setActiveMedia={setActiveMedia}
-            setMedias={setMedias}
-            setInteractionStep={setInteractionStep}
-            hasAnyActiveInteraction={hasAnyActiveInteraction}
-            activeInteraction={activeInteraction}
-            setActiveInteraction={setActiveInteraction}
-            medias={medias}
-            onAddInteraction={onAddInteraction}
-            onDeleteActiveInteraction={onDeleteActiveInteraction}
-            onSaveActiveInteraction={onSaveActiveInteraction}
-            coverIndex={coverIndex}
-            setCoverIndex={setCoverIndex}
-          />
-          <MainContent
-            medias={medias}
-            setMedias={setMedias}
-            activeMedia={activeMedia}
-            activeInteraction={activeInteraction}
-            setActiveInteraction={setActiveInteraction}
-            coverIndex={coverIndex}
-            setCoverIndex={setCoverIndex}
-          />
+    return (
+      <div
+        style={{
+          background: "#262626",
+          flexGrow: 1,
+          width: "100%",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div style={{ padding: "16px", flexGrow: 1 }}>
+          <div
+            style={{
+              border: "2px solid rgba(175, 177, 182, 1)",
+              position: "relative",
+              // width: "100%",
+              // height: "calc(100% - 32px)",
+              // margin: "16px",
+              display: "flex",
+              flexDirection: "column",
+              borderRadius: "8px",
+              // flex: 1,
+            }}
+          >
+            <InteractionHeader
+              activeMedia={activeMedia}
+              setActiveMedia={setActiveMedia}
+              setMedias={setMedias}
+              setInteractionStep={setInteractionStep}
+              hasAnyActiveInteraction={hasAnyActiveInteraction}
+              activeInteraction={activeInteraction}
+              setActiveInteraction={setActiveInteraction}
+              medias={medias}
+              onAddInteraction={onAddInteraction}
+              onDeleteActiveInteraction={onDeleteActiveInteraction}
+              onSaveActiveInteraction={onSaveActiveInteraction}
+              coverIndex={coverIndex}
+              setCoverIndex={setCoverIndex}
+            />
+            <MainContent
+              medias={medias}
+              setMedias={setMedias}
+              activeMedia={activeMedia}
+              activeInteraction={activeInteraction}
+              setActiveInteraction={setActiveInteraction}
+              coverIndex={coverIndex}
+              setCoverIndex={setCoverIndex}
+            />
+          </div>
         </div>
+        <BottomControls
+          medias={medias}
+          activeMedia={activeMedia}
+          setActiveMedia={setActiveMedia}
+          setActiveInteraction={setActiveInteraction}
+          setInteractionStep={setInteractionStep}
+          uploadFile={uploadFile}
+          onFinish={onFinish}
+          coverIndex={coverIndex}
+          setMedias={setMedias}
+          uploadProgress={uploadProgress}
+        />
+        <TextOverlay
+          showOverlay={showOverlay}
+          overlayInput={overlayInput}
+          setOverlayInput={setOverlayInput}
+          onSave={handleSaveTextInteraction}
+          onClose={handleCloseTextOverlay}
+        />
       </div>
-      <BottomControls
-        medias={medias}
-        activeMedia={activeMedia}
-        setActiveMedia={setActiveMedia}
-        setActiveInteraction={setActiveInteraction}
-        setInteractionStep={setInteractionStep}
-        uploadFile={uploadFile}
-        onFinish={onFinish}
-        coverIndex={coverIndex}
-        setMedias={setMedias}
-        uploadingFiles={uploadingFiles}
-      />
-      <TextOverlay
-        showOverlay={showOverlay}
-        overlayInput={overlayInput}
-        setOverlayInput={setOverlayInput}
-        onSave={handleSaveTextInteraction}
-        onClose={handleCloseTextOverlay}
-      />
-    </div>
-  );
-};
+    );
+  }
+);
 
-export { ShortCreateInteractionsStep };
+ShortCreateInteractionsStep.displayName = "ShortCreateInteractionsStep";
+
 export default ShortCreateInteractionsStep;

@@ -4,6 +4,7 @@ import {
   useCallback,
   useRef,
   useState,
+  memo,
 } from "react";
 import { MultipleNativePlayer } from "../MultipleNativePlayer";
 import { InteractionView } from "./InteractionView";
@@ -24,7 +25,7 @@ interface Props {
   media: Media;
 }
 
-function VideoPlayer({
+const VideoPlayer = memo(function VideoPlayer({
   wrapperClassName,
   className,
   style,
@@ -42,7 +43,7 @@ function VideoPlayer({
     ({ toggleMuted }: { toggleMuted: () => void }) => {
       toggleMuted();
     },
-    [],
+    []
   );
 
   const onVideoEnded = useCallback(() => {
@@ -59,6 +60,78 @@ function VideoPlayer({
     }
     setIsPlaying((prev) => !prev);
   }, [isPlaying]);
+
+  // Memoize the play/pause button to prevent flickering
+  const playPauseButton = useCallback(() => {
+    if (!media || media.fileType !== VideoType || activeInteraction !== -1) {
+      return null;
+    }
+
+    return (
+      <button
+        onClick={onToggleVideoClick}
+        color="white"
+        style={{
+          right: "calc(50% - 35px)",
+          padding: 0,
+          background: "none",
+          border: "none",
+          borderRadius: "50%",
+          position: "absolute",
+          marginRight: "12px",
+          marginBottom: "12px",
+          zIndex: 40,
+        }}
+      >
+        {isPlaying ? <Pause /> : <Play />}
+      </button>
+    );
+  }, [media, activeInteraction, isPlaying, onToggleVideoClick]);
+
+  // Memoize the media content to prevent unnecessary re-renders
+  const mediaContent = useCallback(() => {
+    if (!media) return null;
+
+    if (media.fileType === VideoType) {
+      return (
+        <MultipleNativePlayer
+          onEnded={onVideoEnded}
+          ref={videoRef}
+          sources={[media.data]}
+          onClick={onVideoClick}
+        />
+      );
+    } else {
+      return (
+        <img
+          src={media?.data?.src}
+          style={{
+            width: "100%",
+            height: "100%",
+            maxHeight: "100%",
+            objectFit: "contain",
+            backgroundColor: "black",
+          }}
+        />
+      );
+    }
+  }, [media, onVideoEnded, onVideoClick]);
+
+  // Memoize the interactions to prevent unnecessary re-renders
+  const interactions = useCallback(() => {
+    return medias?.[activeMedia]?.interactions.map((interaction, index) => (
+      <InteractionView
+        key={index}
+        index={index}
+        interaction={interaction}
+        medias={medias}
+        setMedias={setMedias}
+        activeMedia={activeMedia}
+        activeInteraction={activeInteraction}
+        setActiveInteraction={setActiveInteraction}
+      />
+    ));
+  }, [medias, activeMedia, activeInteraction, setActiveInteraction, setMedias]);
 
   return (
     <div
@@ -86,63 +159,14 @@ function VideoPlayer({
               maxHeight: "100%",
             }}
           >
-            {media &&
-              media.fileType === VideoType &&
-              activeInteraction === -1 && (
-                <button
-                  onClick={onToggleVideoClick}
-                  color="white"
-                  style={{
-                    right: "calc(50% - 35px)",
-                    padding: 0,
-                    background: "none",
-                    border: "none",
-                    borderRadius: "50%",
-                    position: "absolute",
-                    marginRight: "12px",
-                    marginBottom: "12px",
-                    zIndex: 40,
-                  }}
-                >
-                  {isPlaying ? <Pause /> : <Play />}
-                </button>
-              )}
-            {media && media.fileType === VideoType ? (
-              <MultipleNativePlayer
-                onEnded={onVideoEnded}
-                ref={videoRef}
-                sources={[media.data]}
-                onClick={onVideoClick}
-              />
-            ) : (
-              <img
-                src={media?.data?.src}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  maxHeight: "100%",
-                  objectFit: "contain",
-                  backgroundColor: "black",
-                }}
-              />
-            )}
-            {medias?.[activeMedia]?.interactions.map((interaction, index) => (
-              <InteractionView
-                key={index}
-                index={index}
-                interaction={interaction}
-                medias={medias}
-                setMedias={setMedias}
-                activeMedia={activeMedia}
-                activeInteraction={activeInteraction}
-                setActiveInteraction={setActiveInteraction}
-              />
-            ))}
+            {playPauseButton()}
+            {mediaContent()}
+            {interactions()}
           </div>
         )}
       </Draggable.Container>
     </div>
   );
-}
+});
 
 export { VideoPlayer };

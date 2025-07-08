@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import ShortCreateInteractionsStep from "./interactions";
 import {
   FileType,
@@ -9,6 +15,7 @@ import {
 import { getMediaDuration } from "./shared/utils";
 import Capture from "./createLive/Videos";
 import { Warning } from "./icons";
+
 declare global {
   interface Window {
     ReactNativeWebView?: {
@@ -16,6 +23,30 @@ declare global {
     };
   }
 }
+
+// Custom hook for upload progress tracking
+const useUploadProgress = () => {
+  const [uploadProgress, setUploadProgress] = useState<Map<string, number>>(
+    new Map()
+  );
+  const progressRef = useRef<Map<string, number>>(new Map());
+
+  const updateProgress = useCallback((fileId: string, progress: number) => {
+    progressRef.current.set(fileId, progress);
+    setUploadProgress(new Map(progressRef.current));
+  }, []);
+
+  const removeProgress = useCallback((fileId: string) => {
+    progressRef.current.delete(fileId);
+    setUploadProgress(new Map(progressRef.current));
+  }, []);
+
+  const getProgress = useCallback((fileId: string) => {
+    return progressRef.current.get(fileId) || 0;
+  }, []);
+
+  return { uploadProgress, updateProgress, removeProgress, getProgress };
+};
 
 function App(props: {
   onFinish: (medias: MediaResult[]) => void;
@@ -28,17 +59,21 @@ function App(props: {
   const [coverIndex, setCoverIndex] = useState(0);
   const [isInteractionStep, setIsInteractionStep] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [uploadingFiles, setUploadingFiles] = useState<Map<string, number>>(
-    new Map()
-  );
-  const uploadingFilesRef = useRef<Map<string, number>>(new Map());
 
-  const showToast = (message: string, duration = 3000) => {
+  // Use custom hook for upload progress tracking
+  const { uploadProgress, updateProgress, removeProgress } =
+    useUploadProgress();
+
+  // Use refs to track upload state without causing rerenders
+  const uploadingFilesRef = useRef<Map<string, number>>(new Map());
+  const uploadPromisesRef = useRef<Map<string, Promise<string>>>(new Map());
+
+  const showToast = useCallback((message: string, duration = 3000) => {
     setToastMessage(message);
     setTimeout(() => {
       setToastMessage(null);
     }, duration);
-  };
+  }, []);
 
   // Handle upload progress for media items that need uploading
   useEffect(() => {
@@ -69,30 +104,26 @@ function App(props: {
           // Create a unique ID for this file
           const fileId = `${media.data.file.name}-${media.data.file.size}-${media.data.file.lastModified}`;
 
-          // Check if this file is already being uploaded using both state and ref
-          const isAlreadyUploading =
-            uploadingFiles.has(fileId) || uploadingFilesRef.current.has(fileId);
+          // Check if this file is already being uploaded using ref
+          const isAlreadyUploading = uploadingFilesRef.current.has(fileId);
 
           // Only upload if not already being uploaded
           if (!isAlreadyUploading) {
             console.log("Starting upload for file:", fileId);
             // Add to uploading files with 0 progress
-            setUploadingFiles((prev: Map<string, number>) =>
-              new Map(prev).set(fileId, 0)
-            );
+            uploadingFilesRef.current.set(fileId, 0);
+            updateProgress(fileId, 0);
 
             const onProgress = (progress: number) => {
               console.log("Progress update:", { fileId, progress });
-              // Convert percentage (0-100) to decimal (0-1) for calculations
-              setUploadingFiles((prev: Map<string, number>) => {
-                const newMap = new Map(prev);
-                newMap.set(fileId, progress / 100);
-                return newMap;
-              });
+              // Update progress in ref without causing rerender
+              uploadingFilesRef.current.set(fileId, progress / 100);
+              // Update progress in state for UI display
+              updateProgress(fileId, progress / 100);
             };
 
-            // Start upload for this media
-            props.uploadFile!(media.data.file, onProgress)
+            // Start upload for this media and store the promise
+            const uploadPromise = props.uploadFile!(media.data.file, onProgress)
               .then((uploadedUrl: string) => {
                 console.log("Upload completed:", uploadedUrl);
                 // Mark the media as uploaded
@@ -108,31 +139,71 @@ function App(props: {
                   });
                 });
                 // Remove from uploading files
-                setUploadingFiles((prev: Map<string, number>) => {
-                  const newMap = new Map(prev);
-                  newMap.delete(fileId);
-                  return newMap;
-                });
+                uploadingFilesRef.current.delete(fileId);
+                uploadPromisesRef.current.delete(fileId);
+                removeProgress(fileId);
+                return uploadedUrl;
               })
               .catch((error: any) => {
                 console.error("Upload failed:", error);
                 // Remove from uploading files on error
-                setUploadingFiles((prev: Map<string, number>) => {
-                  const newMap = new Map(prev);
-                  newMap.delete(fileId);
-                  return newMap;
-                });
+                uploadingFilesRef.current.delete(fileId);
+                uploadPromisesRef.current.delete(fileId);
+                removeProgress(fileId);
+                throw error;
               });
+
+            uploadPromisesRef.current.set(fileId, uploadPromise);
           }
         }
       });
     }
-  }, [medias, props.uploadFile, uploadingFiles]);
+  }, [medias, props.uploadFile, updateProgress, removeProgress]);
 
-  // Update ref when uploadingFiles state changes
-  useEffect(() => {
-    uploadingFilesRef.current = uploadingFiles;
-  }, [uploadingFiles]);
+  // Memoize the onSelect callback to prevent unnecessary rerenders
+  const handleMediaSelect = useCallback(
+    async (f: File, mediaType: FileType, thumb: File | null) => {
+      if (mediaType === VideoType) {
+        if (!thumb) return;
+        const duration = await getMediaDuration(f);
+
+        setMedias((prevMedias: Media[]) => {
+          return [
+            ...prevMedias,
+            {
+              data: {
+                file: f,
+                duration: duration,
+                originDuration: duration,
+                trim: { start: 0, end: duration },
+                src: URL.createObjectURL(f),
+                thumbnail: URL.createObjectURL(thumb),
+              },
+              fileType: mediaType,
+              interactions: [],
+            },
+          ];
+        });
+      } else {
+        setMedias((prevMedias: Media[]) => {
+          return [
+            ...prevMedias,
+            {
+              data: {
+                file: f,
+                src: URL.createObjectURL(f),
+              },
+              fileType: mediaType,
+              interactions: [],
+            },
+          ];
+        });
+      }
+
+      setIsInteractionStep(true);
+    },
+    []
+  );
 
   return (
     <div
@@ -150,50 +221,7 @@ function App(props: {
           medias={medias}
           showToast={showToast}
           setIsInteractionStep={setIsInteractionStep}
-          onSelect={async (
-            f: File,
-            mediaType: FileType,
-            thumb: File | null
-          ) => {
-            if (mediaType === VideoType) {
-              if (!thumb) return;
-              const duration = await getMediaDuration(f);
-
-              setMedias((prevMedias: Media[]) => {
-                return [
-                  ...prevMedias,
-                  {
-                    data: {
-                      file: f,
-                      duration: duration,
-                      originDuration: duration,
-                      trim: { start: 0, end: duration },
-                      src: URL.createObjectURL(f),
-                      thumbnail: URL.createObjectURL(thumb),
-                    },
-                    fileType: mediaType,
-                    interactions: [],
-                  },
-                ];
-              });
-            } else {
-              setMedias((prevMedias: Media[]) => {
-                return [
-                  ...prevMedias,
-                  {
-                    data: {
-                      file: f,
-                      src: URL.createObjectURL(f),
-                    },
-                    fileType: mediaType,
-                    interactions: [],
-                  },
-                ];
-              });
-            }
-
-            setIsInteractionStep(true);
-          }}
+          onSelect={handleMediaSelect}
         />
       ) : (
         <ShortCreateInteractionsStep
@@ -204,7 +232,7 @@ function App(props: {
           setCoverIndex={setCoverIndex}
           onFinish={props.onFinish}
           uploadFile={props.uploadFile}
-          uploadingFiles={uploadingFiles}
+          uploadProgress={uploadProgress}
         />
       )}
       {toastMessage && (

@@ -1,3 +1,4 @@
+import React, { memo, useCallback } from "react";
 import MediaThumbnails from "../MediaThumbnails";
 import {
   Media,
@@ -25,122 +26,128 @@ interface BottomControlsProps {
   onFinish: (medias: MediaResult[]) => void;
   coverIndex: number;
   setMedias: React.Dispatch<React.SetStateAction<Media[]>>;
-  uploadingFiles: Map<string, number>;
+  uploadProgress: Map<string, number>;
 }
 
-const BottomControls: React.FC<BottomControlsProps> = ({
-  medias,
-  activeMedia,
-  setActiveMedia,
-  setActiveInteraction,
-  setInteractionStep,
-  uploadFile,
-  onFinish,
-  coverIndex,
-  setMedias,
-  uploadingFiles,
-}) => {
-  const handleFinish = () => {
-    onFinish(
-      medias.map((media): MediaResult => {
-        return {
-          ...media,
-          interactions: media.interactions.map(
-            (interactionItem): InteractionItemResult => {
-              return {
-                payload: interactionItem.payload,
-                geometric: interactionItem.geometric,
-                interaction: interactionItem.interaction.type,
-              };
-            }
-          ),
-        };
-      })
-    );
-  };
+const BottomControls: React.FC<BottomControlsProps> = memo(
+  ({
+    medias,
+    activeMedia,
+    setActiveMedia,
+    setActiveInteraction,
+    setInteractionStep,
+    uploadFile,
+    onFinish,
+    coverIndex,
+    setMedias,
+    uploadProgress,
+  }) => {
+    const handleFinish = useCallback(() => {
+      onFinish(
+        medias.map((media): MediaResult => {
+          return {
+            ...media,
+            interactions: media.interactions.map(
+              (interactionItem): InteractionItemResult => {
+                return {
+                  payload: interactionItem.payload,
+                  geometric: interactionItem.geometric,
+                  interaction: interactionItem.interaction.type,
+                };
+              }
+            ),
+          };
+        })
+      );
+    }, [medias, onFinish]);
 
-  return (
-    <div
-      style={{
-        width: "100%",
-        // height: "90px",
-      }}
-    >
+    return (
       <div
         style={{
           width: "100%",
-          paddingBottom: "13px",
-          paddingLeft: "16px",
-          paddingRight: "16px",
-          flexShrink: 0,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          boxSizing: "border-box",
-          direction: "rtl",
+          // height: "90px",
         }}
       >
-        <MediaThumbnails
-          medias={medias}
-          activeMedia={activeMedia}
-          setActiveMedia={setActiveMedia}
-          setActiveInteraction={setActiveInteraction}
-          uploadFile={uploadFile}
-          setInteractionStep={setInteractionStep}
-          coverIndex={coverIndex}
-          setMedias={setMedias}
-          uploadingFiles={uploadingFiles}
-        />
-      </div>
-      <div>
-        <div style={{ color: "white", display: "flex", marginBottom: "15px" }}>
-          <div
-            style={{
-              marginLeft: "auto",
-              marginRight: "auto",
-              marginTop: "5px",
-              border: "1.5px solid rgba(255, 255, 255, 1)",
-              borderRadius: "8px",
-              width: "63px",
-              textAlign: "center",
-              fontSize: "10px",
-            }}
-          >
-            {toPersianNumbers(
-              medias.filter((m) => m.fileType === ImageType).length
-            )}{" "}
-            / {toPersianNumbers(10)}
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          background: "black",
-          height: "52px",
-          padding: "16px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <button
+        <div
           style={{
             width: "100%",
-            height: "48px",
-            background: "rgba(68, 68, 68, 1)",
-            color: "white",
-            fontWeight: "bold",
-            fontSize: "14px",
-            border: "none",
-            borderRadius: "9px",
+            paddingBottom: "13px",
+            paddingLeft: "16px",
+            paddingRight: "16px",
+            flexShrink: 0,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            boxSizing: "border-box",
+            direction: "rtl",
           }}
-          onClick={handleFinish}
         >
-          ادامه
-        </button>
+          <MediaThumbnails
+            medias={medias}
+            activeMedia={activeMedia}
+            setActiveMedia={setActiveMedia}
+            setActiveInteraction={setActiveInteraction}
+            uploadFile={uploadFile}
+            setInteractionStep={setInteractionStep}
+            coverIndex={coverIndex}
+            setMedias={setMedias}
+            uploadProgress={uploadProgress}
+          />
+        </div>
+        <div>
+          <div
+            style={{ color: "white", display: "flex", marginBottom: "15px" }}
+          >
+            <div
+              style={{
+                marginLeft: "auto",
+                marginRight: "auto",
+                marginTop: "5px",
+                border: "1.5px solid rgba(255, 255, 255, 1)",
+                borderRadius: "8px",
+                width: "63px",
+                textAlign: "center",
+                fontSize: "10px",
+              }}
+            >
+              {toPersianNumbers(
+                medias.filter((m) => m.fileType === ImageType).length
+              )}{" "}
+              / {toPersianNumbers(10)}
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            background: "black",
+            height: "52px",
+            padding: "16px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <button
+            style={{
+              width: "100%",
+              height: "48px",
+              background: "rgba(68, 68, 68, 1)",
+              color: "white",
+              fontWeight: "bold",
+              fontSize: "14px",
+              border: "none",
+              borderRadius: "9px",
+            }}
+            onClick={handleFinish}
+          >
+            ادامه
+          </button>
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
+
+BottomControls.displayName = "BottomControls";
 
 export default BottomControls;
