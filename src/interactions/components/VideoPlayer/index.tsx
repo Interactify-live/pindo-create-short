@@ -151,7 +151,7 @@ const VideoPlayer = memo(function VideoPlayer({
               justifyContent: "center",
               alignItems: "center",
               background: "black",
-              aspectRatio: "9 / 16",
+              // aspectRatio: "9 / 16",
               position: "relative",
               overflow: "hidden",
               width: "100%",

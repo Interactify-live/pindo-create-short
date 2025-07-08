@@ -143,7 +143,7 @@ const ShortCreateInteractionsStep: React.FC<Props> = memo(
           flexDirection: "column",
         }}
       >
-        <div style={{ padding: "16px", flexGrow: 1 }}>
+        <div style={{ padding: "16px", flexGrow: 1, display: "flex" }}>
           <div
             style={{
               border: "2px solid rgba(175, 177, 182, 1)",

@@ -81,7 +81,7 @@ const MediaItem = memo<{
         key={idx}
       >
         {video.thumbnail ? (
-          <div style={{ position: "relative" }}>
+          <div style={{ position: "relative", height: "100%" }}>
             <img
               src={video.thumbnail}
               alt="video thumbnail"
@@ -251,6 +251,7 @@ const MediaThumbnails: React.FC<MediaThumbnailsProps> = memo(
           minWidth: 0,
           width: "100%",
           flexShrink: 0,
+          height: "100%",
         }}
       >
         {mediaItems}

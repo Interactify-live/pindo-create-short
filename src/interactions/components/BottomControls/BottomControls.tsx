@@ -65,13 +65,16 @@ const BottomControls: React.FC<BottomControlsProps> = memo(
       <div
         style={{
           width: "100%",
-          // height: "90px",
+          height: "220px",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <div
           style={{
             width: "100%",
-            paddingBottom: "13px",
+            paddingBottom: "12px",
             paddingLeft: "16px",
             paddingRight: "16px",
             flexShrink: 0,
@@ -80,6 +83,7 @@ const BottomControls: React.FC<BottomControlsProps> = memo(
             alignItems: "center",
             boxSizing: "border-box",
             direction: "rtl",
+            height: "80px",
           }}
         >
           <MediaThumbnails
@@ -94,9 +98,9 @@ const BottomControls: React.FC<BottomControlsProps> = memo(
             uploadProgress={uploadProgress}
           />
         </div>
-        <div>
+        <div style={{ flexShrink: 0 }}>
           <div
-            style={{ color: "white", display: "flex", marginBottom: "15px" }}
+            style={{ color: "white", display: "flex", marginBottom: "12px" }}
           >
             <div
               style={{
@@ -108,29 +112,37 @@ const BottomControls: React.FC<BottomControlsProps> = memo(
                 width: "63px",
                 textAlign: "center",
                 fontSize: "10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "3px",
               }}
             >
-              {toPersianNumbers(
-                medias.filter((m) => m.fileType === ImageType).length
-              )}{" "}
-              / {toPersianNumbers(10)}
+              <div>{toPersianNumbers(10)}</div>
+              <div>/</div>
+              <div>
+                {toPersianNumbers(
+                  medias.filter((m) => m.fileType === ImageType).length
+                )}
+              </div>
             </div>
           </div>
         </div>
         <div
           style={{
             background: "black",
-            height: "52px",
-            padding: "16px",
+            flex: 1,
+            padding: "12px 16px",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            minHeight: "52px",
           }}
         >
           <button
             style={{
               width: "100%",
-              height: "48px",
+              height: "44px",
               background: "rgba(68, 68, 68, 1)",
               color: "white",
               fontWeight: "bold",
