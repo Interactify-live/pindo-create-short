@@ -1,16 +1,30 @@
+import React from "react";
 import { Check } from "../../../icons";
+import { Media, VideoType } from "../../types.d/types";
 
 interface CoverSelectorProps {
   coverIndex: number;
   activeMedia: number;
   setCoverIndex: (index: number) => void;
+  medias: Media[];
 }
 
 const CoverSelector: React.FC<CoverSelectorProps> = ({
   coverIndex,
   activeMedia,
   setCoverIndex,
+  medias,
 }) => {
+  // Don't render if there are no medias or if the active media is a video
+  if (!medias || medias.length === 0 || activeMedia >= medias.length) {
+    return null;
+  }
+
+  const currentMedia = medias[activeMedia];
+  if (currentMedia.fileType === VideoType) {
+    return null;
+  }
+
   return (
     <div
       style={{

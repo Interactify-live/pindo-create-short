@@ -200,6 +200,8 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
           onAddInteraction={onAddInteraction}
           onDeleteActiveInteraction={onDeleteActiveInteraction}
           onSaveActiveInteraction={onSaveActiveInteraction}
+          coverIndex={coverIndex}
+          setCoverIndex={setCoverIndex}
         />
         <MainContent
           medias={medias}

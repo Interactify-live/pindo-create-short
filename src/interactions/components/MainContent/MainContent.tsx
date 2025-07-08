@@ -35,6 +35,7 @@ const MainContent: React.FC<MainContentProps> = ({
         coverIndex={coverIndex}
         activeMedia={activeMedia}
         setCoverIndex={setCoverIndex}
+        medias={medias}
       />
     </div>
   );

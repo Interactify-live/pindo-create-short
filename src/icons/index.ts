@@ -10,3 +10,4 @@ export { default as Rotate } from './Rotate';
 export { default as Check } from './Check';
 export { default as Add } from './Add';
 export { default as Warning } from './Warning';
+export { default as VideoPlay } from './VideoPlay';

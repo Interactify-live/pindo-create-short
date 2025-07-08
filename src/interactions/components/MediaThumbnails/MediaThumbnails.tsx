@@ -1,5 +1,5 @@
 import { Media, Video, Image, VideoType, ImageType } from "../../types.d/types";
-import { Add } from "../../../icons";
+import { Add, VideoPlay } from "../../../icons";
 
 interface MediaThumbnailsProps {
   medias: Media[];
@@ -71,6 +71,20 @@ const MediaThumbnails: React.FC<MediaThumbnailsProps> = ({
                     }}
                     onClick={() => handleMediaClick(idx)}
                   />
+                  {/* Video Play Icon - Centered */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <VideoPlay width={24} height={24} />
+                  </div>
                   {showProgress && (
                     <div
                       style={{
@@ -97,6 +111,20 @@ const MediaThumbnails: React.FC<MediaThumbnailsProps> = ({
                   }}
                   onClick={() => handleMediaClick(idx)}
                 >
+                  {/* Video Play Icon - Centered */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <VideoPlay width={24} height={24} />
+                  </div>
                   {showProgress && (
                     <div
                       style={{

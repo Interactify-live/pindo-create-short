@@ -3,7 +3,7 @@ import Trash from "../../../icons/trash";
 import { InteractionsContainer } from "../InteractionsContainer";
 import { INTERACTIONS_CONTAINER_BASE_WIDTH } from "../../../shared/constants";
 import { Interaction } from "../Interactions";
-import { Media } from "../../types.d/types";
+import { Media, VideoType } from "../../types.d/types";
 
 interface InteractionHeaderProps {
   activeMedia: number;
@@ -17,6 +17,8 @@ interface InteractionHeaderProps {
   onAddInteraction: (interaction: Interaction) => void;
   onDeleteActiveInteraction: () => void;
   onSaveActiveInteraction: () => void;
+  coverIndex: number;
+  setCoverIndex: (index: number) => void;
 }
 
 const InteractionHeader: React.FC<InteractionHeaderProps> = ({
@@ -31,20 +33,39 @@ const InteractionHeader: React.FC<InteractionHeaderProps> = ({
   onAddInteraction,
   onDeleteActiveInteraction,
   onSaveActiveInteraction,
+  coverIndex,
+  setCoverIndex,
 }) => {
   const handleDeleteMedia = () => {
     setMedias((prev) => {
       const updated = prev.filter((_, i) => i !== activeMedia);
+
       if (updated.length === 0) {
         setInteractionStep(false);
       } else {
-        console.log("INO", activeMedia);
+        // Handle cover index when the deleted media was the cover
+        if (activeMedia === coverIndex) {
+          // Find the first image in the updated array to set as cover
+          const firstImageIndex = updated.findIndex(media => media.fileType !== VideoType);
+          if (firstImageIndex !== -1) {
+            setCoverIndex(firstImageIndex);
+          } else {
+            // If no images found, set cover to 0 (first item)
+            setCoverIndex(0);
+          }
+        } else if (activeMedia < coverIndex) {
+          // If deleted media was before the cover, adjust cover index
+          setCoverIndex(coverIndex - 1);
+        }
+
+        // Handle active media adjustment
         if (activeMedia > 0) {
           setActiveMedia(activeMedia - 1);
         } else {
           setActiveMedia(0);
         }
       }
+
       return updated;
     });
   };
