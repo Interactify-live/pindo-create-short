@@ -88,9 +88,12 @@ const MediaItem = memo<{
               style={{
                 width: "62px",
                 height: "62px",
-                borderRadius: "4px",
+                borderRadius: "10px",
                 transform: "translateZ(0)", // Force hardware acceleration
                 backfaceVisibility: "hidden", // Prevent flickering
+                boxSizing: "border-box",
+                border: idx === activeMedia ? "4px solid #0C8CE9" : "none",
+                display: "block",
               }}
               onClick={handleClick}
             />
@@ -119,8 +122,10 @@ const MediaItem = memo<{
               width: "62px",
               height: "62px",
               background: "#ccc",
-              borderRadius: "4px",
+              borderRadius: "10px",
               position: "relative",
+              boxSizing: "border-box",
+              border: idx === activeMedia ? "4px solid #0C8CE9" : "none",
             }}
             onClick={handleClick}
           >
