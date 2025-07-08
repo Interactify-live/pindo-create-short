@@ -23,9 +23,32 @@ function BrowseFileButton({ onSelect, disabled, showToast, medias }: Props) {
       if (input.files && input.files.length > 0) {
         const files = Array.from(input.files);
 
+        // Filter out duplicate files that are already in the medias array
+        const uniqueFiles = files.filter((file) => {
+          return !medias.some((media) => {
+            const existingFile = media.data.file;
+            return (
+              existingFile.name === file.name &&
+              existingFile.size === file.size &&
+              existingFile.lastModified === file.lastModified
+            );
+          });
+        });
+
+        if (uniqueFiles.length === 0) {
+          showToast("تمام فایل‌های انتخاب شده قبلاً اضافه شده‌اند", "warning");
+          return;
+        }
+
+        if (uniqueFiles.length < files.length) {
+          showToast("برخی فایل‌های تکراری نادیده گرفته شدند", "info");
+        }
+
         // Separate videos and images
-        let videos = files.filter((file) => file.type.startsWith("video/"));
-        let images = files.filter(
+        let videos = uniqueFiles.filter((file) =>
+          file.type.startsWith("video/")
+        );
+        let images = uniqueFiles.filter(
           (file) =>
             file.type.startsWith("image/") &&
             ["image/jpeg", "image/png"].includes(file.type)

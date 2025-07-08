@@ -22,9 +22,10 @@ interface BottomControlsProps {
     file: File,
     onProgress: (progress: number) => void
   ) => Promise<string>;
-  uploadProgressValue: number;
   onFinish: (medias: MediaResult[]) => void;
   coverIndex: number;
+  setMedias: React.Dispatch<React.SetStateAction<Media[]>>;
+  uploadingFiles: Map<string, number>;
 }
 
 const BottomControls: React.FC<BottomControlsProps> = ({
@@ -34,9 +35,10 @@ const BottomControls: React.FC<BottomControlsProps> = ({
   setActiveInteraction,
   setInteractionStep,
   uploadFile,
-  uploadProgressValue,
   onFinish,
   coverIndex,
+  setMedias,
+  uploadingFiles,
 }) => {
   const handleFinish = () => {
     onFinish(
@@ -84,9 +86,10 @@ const BottomControls: React.FC<BottomControlsProps> = ({
           setActiveMedia={setActiveMedia}
           setActiveInteraction={setActiveInteraction}
           uploadFile={uploadFile}
-          uploadProgressValue={uploadProgressValue}
           setInteractionStep={setInteractionStep}
           coverIndex={coverIndex}
+          setMedias={setMedias}
+          uploadingFiles={uploadingFiles}
         />
       </div>
       <div>

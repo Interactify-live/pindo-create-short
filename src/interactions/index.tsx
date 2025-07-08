@@ -19,6 +19,7 @@ interface Props {
     file: File,
     onProgress: (progress: number) => void
   ) => Promise<string>;
+  uploadingFiles: Map<string, number>;
 }
 
 const ShortCreateInteractionsStep: React.FC<Props> = ({
@@ -29,6 +30,7 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
   setCoverIndex,
   onFinish,
   uploadFile,
+  uploadingFiles,
 }: Props) => {
   const [activeInteraction, setActiveInteraction] = useState(-1);
   const hasAnyActiveInteraction = activeInteraction !== -1;
@@ -38,45 +40,6 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
   const [activeMedia, setActiveMedia] = useState(
     medias.length > 0 ? medias.length - 1 : 0
   );
-  const [uploadProgressValue, setUploadProgressValue] = useState<number>(0);
-
-  // Initialize upload progress for the latest media item
-  useEffect(() => {
-    console.log("KOS", medias.length, uploadFile);
-    if (uploadFile && medias.length > 0) {
-      const latestMedia = medias[medias.length - 1];
-
-      // Only upload if the media hasn't been uploaded yet
-      if (!latestMedia.isUploaded) {
-        const onProgress = (progress: number) => {
-          console.log("KOOOOOOOOOOOOOOOON", progress, 100 - progress);
-          // Convert percentage (0-100) to decimal (0-1) for calculations
-          setUploadProgressValue(progress / 100);
-        };
-
-        // Start upload for the latest media
-        uploadFile(latestMedia.data.file, onProgress)
-          .then((uploadedUrl) => {
-            console.log("Upload completed:", uploadedUrl);
-            // Mark the media as uploaded
-            setMedias((prevMedias) => {
-              return prevMedias.map((media, index) => {
-                if (index === medias.length - 1) {
-                  return {
-                    ...media,
-                    isUploaded: true,
-                  };
-                }
-                return media;
-              });
-            });
-          })
-          .catch((error) => {
-            console.error("Upload failed:", error);
-          });
-      }
-    }
-  }, [medias.length, uploadFile]);
 
   useEffect(() => {
     console.log("KIR", medias[activeMedia]);
@@ -168,50 +131,52 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
     <div
       style={{
         background: "#262626",
-        height: "100vh",
-        width: "100vw",
+        flexGrow: 1,
+        width: "100%",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      <div
-        style={{
-          border: "2px solid rgba(175, 177, 182, 1)",
-          position: "relative",
-          width: "calc(100% - 32px)",
-          height: "calc(100% - 32px)",
-          margin: "16px",
-          display: "flex",
-          flexDirection: "column",
-          borderRadius: "8px",
-          flex: 1,
-        }}
-      >
-        <InteractionHeader
-          activeMedia={activeMedia}
-          setActiveMedia={setActiveMedia}
-          setMedias={setMedias}
-          setInteractionStep={setInteractionStep}
-          hasAnyActiveInteraction={hasAnyActiveInteraction}
-          activeInteraction={activeInteraction}
-          setActiveInteraction={setActiveInteraction}
-          medias={medias}
-          onAddInteraction={onAddInteraction}
-          onDeleteActiveInteraction={onDeleteActiveInteraction}
-          onSaveActiveInteraction={onSaveActiveInteraction}
-          coverIndex={coverIndex}
-          setCoverIndex={setCoverIndex}
-        />
-        <MainContent
-          medias={medias}
-          setMedias={setMedias}
-          activeMedia={activeMedia}
-          activeInteraction={activeInteraction}
-          setActiveInteraction={setActiveInteraction}
-          coverIndex={coverIndex}
-          setCoverIndex={setCoverIndex}
-        />
+      <div style={{ padding: "16px", flexGrow: 1 }}>
+        <div
+          style={{
+            border: "2px solid rgba(175, 177, 182, 1)",
+            position: "relative",
+            // width: "100%",
+            // height: "calc(100% - 32px)",
+            // margin: "16px",
+            display: "flex",
+            flexDirection: "column",
+            borderRadius: "8px",
+            // flex: 1,
+          }}
+        >
+          <InteractionHeader
+            activeMedia={activeMedia}
+            setActiveMedia={setActiveMedia}
+            setMedias={setMedias}
+            setInteractionStep={setInteractionStep}
+            hasAnyActiveInteraction={hasAnyActiveInteraction}
+            activeInteraction={activeInteraction}
+            setActiveInteraction={setActiveInteraction}
+            medias={medias}
+            onAddInteraction={onAddInteraction}
+            onDeleteActiveInteraction={onDeleteActiveInteraction}
+            onSaveActiveInteraction={onSaveActiveInteraction}
+            coverIndex={coverIndex}
+            setCoverIndex={setCoverIndex}
+          />
+          <MainContent
+            medias={medias}
+            setMedias={setMedias}
+            activeMedia={activeMedia}
+            activeInteraction={activeInteraction}
+            setActiveInteraction={setActiveInteraction}
+            coverIndex={coverIndex}
+            setCoverIndex={setCoverIndex}
+          />
+        </div>
       </div>
       <BottomControls
         medias={medias}
@@ -220,9 +185,10 @@ const ShortCreateInteractionsStep: React.FC<Props> = ({
         setActiveInteraction={setActiveInteraction}
         setInteractionStep={setInteractionStep}
         uploadFile={uploadFile}
-        uploadProgressValue={uploadProgressValue}
         onFinish={onFinish}
         coverIndex={coverIndex}
+        setMedias={setMedias}
+        uploadingFiles={uploadingFiles}
       />
       <TextOverlay
         showOverlay={showOverlay}

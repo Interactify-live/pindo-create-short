@@ -1,5 +1,4 @@
 const path = require("path");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { ProvidePlugin } = require("webpack");
 
 /** @type {import('webpack').Configuration[]} */
@@ -110,7 +109,7 @@ function shared() {
         {
           test: /\.module\.s[ac]ss$/,
           use: [
-            MiniCssExtractPlugin.loader,
+            "style-loader",
             {
               loader: "css-loader",
               options: {
@@ -135,7 +134,7 @@ function shared() {
           test: /\.s[ac]ss$/,
           exclude: /\.module\.s[ac]ss$/,
           use: [
-            MiniCssExtractPlugin.loader,
+            "style-loader",
             "css-loader",
             {
               loader: "sass-loader",
@@ -157,9 +156,6 @@ function shared() {
       ],
     },
     plugins: [
-      new MiniCssExtractPlugin({
-        filename: "styles.css",
-      }),
       new ProvidePlugin({
         React: "react",
       }),

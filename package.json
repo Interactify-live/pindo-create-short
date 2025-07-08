@@ -1,6 +1,6 @@
 {
   "name": "@livuvo/short-sdk-wizard",
-  "version": "0.8.25",
+  "version": "0.8.29",
   "main": "dist/index.cjs.js",
   "types": "types/index.d.ts",
   "module": "dist/index.esm.js",
@@ -36,9 +36,9 @@
     "@types/react-dom": "18.2.0",
     "babel-loader": "^9.1.2",
     "css-loader": "^6.8.1",
-    "mini-css-extract-plugin": "^2.7.6",
     "sass": "^1.89.0",
     "sass-loader": "^16.0.5",
+    "style-loader": "^3.3.3",
     "typescript": "^4.9.5",
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1"
