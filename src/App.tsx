@@ -66,7 +66,7 @@ function App(props: {
 
   // Use refs to track upload state without causing rerenders
   const uploadingFilesRef = useRef<Map<string, number>>(new Map());
-  const uploadPromisesRef = useRef<Map<string, Promise<string>>>(new Map());
+  const uploadPromisesRef = useRef<Map<string, Promise<any>>>(new Map());
 
   const showToast = useCallback((message: string, duration = 3000) => {
     setToastMessage(message);
@@ -124,15 +124,16 @@ function App(props: {
 
             // Start upload for this media and store the promise
             const uploadPromise = props.uploadFile!(media.data.file, onProgress)
-              .then((uploadedUrl: string) => {
-                console.log("Upload completed:", uploadedUrl);
-                // Mark the media as uploaded
+              .then((uploadResponse: any) => {
+                console.log("Upload completed:", uploadResponse);
+                // Mark the media as uploaded and store the response
                 setMedias((prevMedias: Media[]) => {
                   return prevMedias.map((m: Media, i: number) => {
                     if (i === index) {
                       return {
                         ...m,
                         isUploaded: true,
+                        response: uploadResponse,
                       };
                     }
                     return m;
@@ -142,7 +143,7 @@ function App(props: {
                 uploadingFilesRef.current.delete(fileId);
                 uploadPromisesRef.current.delete(fileId);
                 removeProgress(fileId);
-                return uploadedUrl;
+                return uploadResponse;
               })
               .catch((error: any) => {
                 console.error("Upload failed:", error);

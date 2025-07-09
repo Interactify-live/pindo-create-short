@@ -18,7 +18,7 @@ interface Props {
   uploadFile?: (
     file: File,
     onProgress: (progress: number) => void
-  ) => Promise<string>;
+  ) => Promise<any>;
   uploadProgress: Map<string, number>;
 }
 

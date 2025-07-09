@@ -25,7 +25,7 @@ function AppRefactored(props: {
   uploadFile?: (
     file: File,
     onProgress: (progress: number) => void
-  ) => Promise<string>;
+  ) => Promise<any>;
 }) {
   const [medias, setMedias] = useState<Media[]>([]);
   const [coverIndex, setCoverIndex] = useState(0);

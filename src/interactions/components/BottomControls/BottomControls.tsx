@@ -22,7 +22,7 @@ interface BottomControlsProps {
   uploadFile?: (
     file: File,
     onProgress: (progress: number) => void
-  ) => Promise<string>;
+  ) => Promise<any>;
   onFinish: (medias: MediaResult[]) => void;
   coverIndex: number;
   setMedias: React.Dispatch<React.SetStateAction<Media[]>>;

@@ -10,7 +10,7 @@ interface MediaThumbnailsProps {
   uploadFile?: (
     file: File,
     onProgress: (progress: number) => void
-  ) => Promise<string>;
+  ) => Promise<any>;
   setInteractionStep: (value: boolean) => void;
   coverIndex: number;
   setMedias: React.Dispatch<React.SetStateAction<Media[]>>;

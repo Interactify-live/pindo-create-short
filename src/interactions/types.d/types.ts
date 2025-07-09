@@ -29,6 +29,7 @@ export interface Media {
   data: Video | Image;
   interactions: InteractionItem[];
   isUploaded?: boolean;
+  response?: any;
 }
 
 export interface InteractionItemResult {
@@ -41,4 +42,5 @@ export interface MediaResult {
   fileType: FileType;
   data: Video | Image;
   interactions: InteractionItemResult[];
+  response?: any;
 }
