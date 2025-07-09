@@ -1,6 +1,11 @@
-import { getMediaDuration } from '../utils';
-import { generateThumbnailFromFile } from '../../utils/thumbnail';
-import { FileType, VideoType, ImageType, Media } from '../../interactions/types.d/types';
+import { getMediaDuration } from "../utils";
+import { generateThumbnailFromFile } from "../../utils/thumbnail";
+import {
+  FileType,
+  VideoType,
+  ImageType,
+  Media,
+} from "../../interactions/types.d/types";
 
 export interface ProcessedMedia {
   file: File;
@@ -12,13 +17,13 @@ export interface ProcessedMedia {
 }
 
 export const processMediaFile = async (file: File): Promise<ProcessedMedia> => {
-  const type = file.type.startsWith('video/') ? VideoType : ImageType;
+  const type = file.type.startsWith("video/") ? VideoType : ImageType;
   const src = URL.createObjectURL(file);
 
   if (type === VideoType) {
     const [duration, thumbnail] = await Promise.all([
       getMediaDuration(file),
-      generateThumbnailFromFile(file)
+      generateThumbnailFromFile(file),
     ]);
 
     return {
@@ -43,8 +48,8 @@ export const validateMediaConstraints = (
   newMediaType: FileType,
   showToast: (message: string) => void
 ): boolean => {
-  const videoCount = medias.filter(m => m.fileType === VideoType).length;
-  const imageCount = medias.filter(m => m.fileType !== VideoType).length;
+  const videoCount = medias.filter((m) => m.fileType === VideoType).length;
+  const imageCount = medias.filter((m) => m.fileType !== VideoType).length;
 
   if (newMediaType === VideoType && videoCount >= 1) {
     showToast("شما حداکثر یک ویدیو می توانید داشته باشید");

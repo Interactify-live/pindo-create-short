@@ -11,10 +11,12 @@ import {
   Media,
   MediaResult,
   VideoType,
+  InteractionItem,
 } from "./interactions/types.d/types";
 import { getMediaDuration } from "./shared/utils";
 import Capture from "./createLive/Videos";
 import { Warning } from "./icons";
+import { INTERACTIONS } from "./interactions/components/Interactions";
 
 declare global {
   interface Window {
@@ -23,6 +25,37 @@ declare global {
     };
   }
 }
+
+// Function to transform MediaResult to Media
+const transformMediaResultToMedia = (mediaResult: MediaResult): Media => {
+  const transformedInteractions: InteractionItem[] =
+    mediaResult.interactions.map((interactionResult) => {
+      // Find the interaction by type
+      const interaction = Object.values(INTERACTIONS).find(
+        (interaction) => interaction.type === interactionResult.interaction
+      );
+
+      if (!interaction) {
+        throw new Error(
+          `Unknown interaction type: ${interactionResult.interaction}`
+        );
+      }
+
+      return {
+        interaction,
+        payload: interactionResult.payload,
+        geometric: interactionResult.geometric,
+      };
+    });
+
+  return {
+    fileType: mediaResult.fileType,
+    data: mediaResult.data,
+    interactions: transformedInteractions,
+    isUploaded: true, // If we have initialData, assume it's already uploaded
+    response: mediaResult.response,
+  };
+};
 
 // Custom hook for upload progress tracking
 const useUploadProgress = () => {
@@ -54,10 +87,18 @@ function App(props: {
     file: File,
     onProgress: (progress: number) => void
   ) => Promise<any>;
+  initialData?: MediaResult[];
 }) {
-  const [medias, setMedias] = useState<Media[]>([]);
+  const [medias, setMedias] = useState<Media[]>(() => {
+    if (props.initialData) {
+      return props.initialData.map(transformMediaResultToMedia);
+    }
+    return [];
+  });
   const [coverIndex, setCoverIndex] = useState(0);
-  const [isInteractionStep, setIsInteractionStep] = useState(false);
+  const [isInteractionStep, setIsInteractionStep] = useState(() => {
+    return props.initialData ? props.initialData.length > 0 : false;
+  });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Use custom hook for upload progress tracking
